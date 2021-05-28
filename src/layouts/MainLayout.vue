@@ -45,6 +45,7 @@
               label="Email"
               lazy-rules
               :rules="[
+                (val) => (val && val.length > 0) || 'Please enter your mail address',
                 (val) => val.length <= 64 || 'Email must be 64 characters or less',
                 (val) =>
                   new RegExp('^([A-Za-z0-9_\\-.])+@([A-Za-z0-9_\\-.])+\\.([A-Za-z]{2,15})$').test(val) ||
@@ -84,8 +85,8 @@
               </template>
             </q-input>
             <div>
-              <q-btn label="Register" type="submit" color="primary" />
-              <q-btn label="Cancel" type="reset" color="primary" flat @click="login = false" class="q-ml-sm" />
+              <q-btn :loading="registerLoading" label="Register" type="submit" color="primary" @click="register" />
+              <q-btn label="Cancel" type="reset" color="primary" flat class="q-ml-sm" @click="login = false" />
             </div>
           </q-form>
         </q-tab-panel>
@@ -96,17 +97,42 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue"
+import { api } from "boot/axios"
+import { useQuasar } from "quasar"
 
 export default defineComponent({
   name: "MainLayout",
   setup() {
+    const $q = useQuasar()
+
+    const email = ref("")
+    const username = ref("")
+    const password = ref("")
+    const registerLoading = ref(false)
+
+    const register = async () => {
+      registerLoading.value = true
+      let data = { email: email.value, username: username.value, password: password.value }
+      await api.post("/user/register", data).catch((e) => {
+        console.log(e)
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Loading failed",
+          icon: "report_problem",
+        })
+      })
+      registerLoading.value = false
+    }
     return {
       login: ref(false),
       tab: ref("login"),
       showPwd: ref(false),
-      email: ref(""),
-      username: ref(""),
-      password: ref(""),
+      email,
+      username,
+      password,
+      register,
+      registerLoading,
     }
   },
 })
