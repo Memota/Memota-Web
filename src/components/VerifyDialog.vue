@@ -25,13 +25,13 @@
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="login"> </q-tab-panel>
         <q-tab-panel name="register">
-          <q-form ref="registerForm" class="q-gutter-md">
+          <q-form class="q-gutter-md">
             <q-input
               v-model="email"
               filled
               type="email"
               label="Email"
-              :lazy-rules="true"
+              lazy-rules
               :rules="[
                 (val) => (val && val.length > 0) || 'Please enter your mail address',
                 (val) => val.length <= 64 || 'Email must be 64 characters or less',
@@ -44,7 +44,7 @@
               v-model="username"
               filled
               label="Username"
-              :lazy-rules="true"
+              lazy-rules
               :rules="[
                 (val) => (val && val.length > 0) || 'Please enter your username',
                 (val) => val.length <= 32 || 'Username must be 32 characters or less',
@@ -57,7 +57,7 @@
               filled
               :type="showPwd ? 'text' : 'password'"
               label="Password"
-              :lazy-rules="true"
+              lazy-rules
               :rules="[
                 (val) => (val && val.length > 0) || 'Please enter your password',
                 (val) => val.length <= 64 || 'Password must be 64 characters or less',
@@ -86,7 +86,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue"
 import { api } from "boot/axios"
-import { useQuasar, QForm } from "quasar"
+import { useQuasar } from "quasar"
 
 export default defineComponent({
   name: "LoginDialog",
@@ -94,14 +94,12 @@ export default defineComponent({
   setup() {
     const $q = useQuasar()
 
-    const registerForm = ref<QForm>()
     const email = ref("")
     const username = ref("")
     const password = ref("")
     const registerLoading = ref(false)
 
     const register = async () => {
-      if (!(await registerForm.value?.validate())) return
       registerLoading.value = true
       let data = { email: email.value, username: username.value, password: password.value }
       await api.post("/user/register", data).catch((e) => {
@@ -123,7 +121,6 @@ export default defineComponent({
       password,
       register,
       registerLoading,
-      registerForm,
     }
   },
 })
