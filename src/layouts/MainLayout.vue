@@ -20,8 +20,8 @@ import { defineComponent, ref } from "vue"
 import LoginDialog from "../components/LoginDialog.vue"
 
 export default defineComponent({
-  components: { LoginDialog },
   name: "MainLayout",
+  components: { LoginDialog },
   setup() {
     return {
       login: ref(false),
