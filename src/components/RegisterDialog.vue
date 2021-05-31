@@ -76,6 +76,15 @@
 import { defineComponent, ref } from "vue"
 import { api } from "boot/axios"
 import { useQuasar, QForm } from "quasar"
+import { AxiosError } from "axios"
+
+interface ErrorResponse {
+  value: string
+  property: string
+  constraints: {
+    IsUniq: string
+  }
+}
 
 export default defineComponent({
   name: "RegisterDialog",
@@ -96,16 +105,38 @@ export default defineComponent({
       if (!(await registerForm.value?.validate())) return
       registerLoading.value = true
       let data = { email: email.value, username: username.value, password: password.value }
-      await api.post("/user/register", data).catch((e) => {
-        console.log(e)
-        $q.notify({
-          color: "negative",
-          position: "top",
-          message: "Loading failed",
-          icon: "report_problem",
+      api
+        .post("/user/register", data)
+        .then((response) => {
+          console.log(response)
+          registerLoading.value = false
         })
-      })
-      registerLoading.value = false
+        .catch((e: AxiosError) => {
+          console.log(e.response)
+          if (e.response?.data && e.response.status === 400 && Array.isArray(e.response?.data)) {
+            const errors: ErrorResponse[] = e.response.data as ErrorResponse[]
+            errors.forEach((e) => {
+              if (e.constraints.IsUniq) {
+                $q.notify({
+                  group: false,
+                  color: "negative",
+                  position: "top",
+                  message: `User with ${e.property} ${e.value} already exists`,
+                  icon: "info",
+                })
+              }
+              console.log(e)
+            })
+          } else {
+            $q.notify({
+              color: "negative",
+              position: "top",
+              message: "Something went wrong",
+              icon: "report_problem",
+            })
+          }
+          registerLoading.value = false
+        })
     }
     return {
       showPwd: ref(false),
