@@ -7,16 +7,33 @@
       </div>
       <q-card-section class="text-center">
         <div class="text-h5">Verify your email</div>
-        <div>You will need to verify your email to complete registration.</div>
+        <div>You will need to verify your email to complete your registration.</div>
         <div><q-icon name="o_mail" style="font-size: 10em" /></div>
-        <q-btn
-          :loading="registerLoading"
-          class="submit-button"
-          label="Resend"
-          type="submit"
-          color="primary"
-          @click="register"
-        />
+        <q-form ref="resendForm">
+          <q-input
+            v-model="email"
+            outlined
+            type="email"
+            label="Email"
+            :lazy-rules="true"
+            :rules="[
+              (val) => (val && val.length > 0) || 'Please enter your mail address',
+              (val) => val.length <= 64 || 'Email must be 64 characters or less',
+              (val) =>
+                new RegExp('^([A-Za-z0-9_\\-.])+@([A-Za-z0-9_\\-.])+\\.([A-Za-z]{2,15})$').test(val) ||
+                'Mail address must be valid',
+            ]"
+          >
+          </q-input>
+          <q-btn
+            :loading="registerLoading"
+            class="submit-button"
+            label="Resend"
+            type="submit"
+            color="primary"
+            @click="resend"
+          />
+        </q-form>
       </q-card-section>
       <div class="bottom">
         <q-separator />
@@ -43,17 +60,15 @@ export default defineComponent({
   setup() {
     const $q = useQuasar()
 
-    const registerForm = ref<QForm>()
+    const resendForm = ref<QForm>()
     const email = ref("")
-    const username = ref("")
-    const password = ref("")
     const registerLoading = ref(false)
 
-    const register = async () => {
-      if (!(await registerForm.value?.validate())) return
+    const resend = async () => {
+      if (!(await resendForm.value?.validate())) return
       registerLoading.value = true
-      let data = { email: email.value, username: username.value, password: password.value }
-      await api.post("/user/register", data).catch((e) => {
+      let data = { email: email.value }
+      await api.post("/user/resend", data).catch((e) => {
         console.log(e)
         $q.notify({
           color: "negative",
@@ -67,11 +82,9 @@ export default defineComponent({
     return {
       showPwd: ref(false),
       email,
-      username,
-      password,
-      register,
+      resend,
       registerLoading,
-      registerForm,
+      resendForm,
       test: ref(true),
     }
   },
@@ -81,8 +94,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 @media (min-width: $breakpoint-md-min) {
   .q-card__section {
-    width: 500px;
-    margin: 110px 70px 80px;
+    width: 550px;
+    margin: 110px 50px 80px;
   }
 }
 
