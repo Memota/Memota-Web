@@ -3,6 +3,7 @@ import { RouteRecordRaw } from "vue-router"
 const MainLayout = () => import("layouts/MainLayout.vue")
 const Index = () => import("pages/Index.vue")
 const RegisterDialog = () => import("components/RegisterDialog.vue")
+const VerifyDialog = () => import("components/VerifyDialog.vue")
 
 const routes: RouteRecordRaw[] = [
   {
@@ -18,6 +19,13 @@ const routes: RouteRecordRaw[] = [
         components: {
           default: Index,
           dialog: RegisterDialog,
+        },
+      },
+      {
+        path: "verify",
+        components: {
+          default: Index,
+          dialog: VerifyDialog,
         },
       },
     ],
