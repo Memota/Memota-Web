@@ -1,11 +1,11 @@
 <template>
-  <q-dialog persistent :maximized="$q.screen.xs || $q.screen.sm">
+  <q-dialog v-model="test" persistent :maximized="$q.screen.xs || $q.screen.sm">
     <q-card>
       <div class="top">
-        <div><q-btn round flat icon="arrow_back" @click="$emit('close')"></q-btn></div>
+        <div><q-btn round flat icon="arrow_back" @click="$router.go(-1)"></q-btn></div>
         <div class="nav-text text-h6">Register</div>
       </div>
-      <q-form v-if="card === 'register'" ref="registerForm">
+      <q-form ref="registerForm">
         <q-input
           v-model="email"
           outlined
@@ -63,7 +63,7 @@
       </q-form>
       <div class="bottom">
         <q-separator />
-        <q-btn class="switch-button" flat @click="card = 'login'">
+        <q-btn class="switch-button" flat @click="$router.push('login')">
           <div>Already have an account?&nbsp;</div>
           <div class="text-primary">Login</div>
         </q-btn>
@@ -78,8 +78,11 @@ import { api } from "boot/axios"
 import { useQuasar, QForm } from "quasar"
 
 export default defineComponent({
-  name: "LoginDialog",
-  emits: ["close"],
+  name: "RegisterDialog",
+  beforeRouteEnter(to, from, next) {
+    console.log(from)
+    next()
+  },
   setup() {
     const $q = useQuasar()
 
@@ -105,7 +108,6 @@ export default defineComponent({
       registerLoading.value = false
     }
     return {
-      card: ref("register"),
       showPwd: ref(false),
       email,
       username,
@@ -113,6 +115,7 @@ export default defineComponent({
       register,
       registerLoading,
       registerForm,
+      test: ref(true),
     }
   },
 })

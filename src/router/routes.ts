@@ -1,10 +1,26 @@
 import { RouteRecordRaw } from "vue-router"
 
+const MainLayout = () => import("layouts/MainLayout.vue")
+const Index = () => import("pages/Index.vue")
+const RegisterDialog = () => import("components/RegisterDialog.vue")
+
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/Index.vue") }],
+    component: MainLayout,
+    children: [
+      {
+        path: "",
+        component: Index,
+      },
+      {
+        path: "register",
+        components: {
+          default: Index,
+          dialog: RegisterDialog,
+        },
+      },
+    ],
   },
 
   // Always leave this as last one,

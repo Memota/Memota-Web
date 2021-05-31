@@ -4,28 +4,23 @@
       <q-toolbar>
         <q-btn flat round icon="menu" />
         <q-toolbar-title>Memota</q-toolbar-title>
-        <q-btn stretch flat label="Login" @click="login = true" />
+        <q-btn stretch flat label="Login" @click="$router.push('register')" />
       </q-toolbar>
     </q-header>
     <q-page-container>
       <router-view />
     </q-page-container>
   </q-layout>
-  <LoginDialog v-model="login" @close="login = false"></LoginDialog>
+  <router-view name="dialog" />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue"
-
-import LoginDialog from "../components/LoginDialog.vue"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   name: "MainLayout",
-  components: { LoginDialog },
   setup() {
-    return {
-      login: ref(false),
-    }
+    return {}
   },
 })
 </script>
