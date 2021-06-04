@@ -75,7 +75,6 @@ export default defineComponent({
             if (e.response.status === 400 && !Array.isArray(e.response?.data)) {
               message = "Email was not found or user is already verified"
             } else if (e.response.status === 429) {
-              console.log(e.response?.data)
               message = "You can only resend your verification email every 15 minutes"
             }
           }

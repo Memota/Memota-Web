@@ -17,7 +17,6 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     if (route?.params.token) {
-      console.log(route?.params.token)
       void api
         .post("/user/verify/" + route?.params.token.toString())
         .then(() => {

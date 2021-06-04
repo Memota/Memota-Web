@@ -99,12 +99,10 @@ export default defineComponent({
       api
         .post("/user/register", data)
         .then((response) => {
-          console.log(response)
           registerLoading.value = false
           void router.push("verify")
         })
         .catch((e: AxiosError) => {
-          console.log(e.response)
           if (e.response?.data && e.response.status === 400 && Array.isArray(e.response?.data)) {
             const errors: ErrorResponse[] = e.response.data as ErrorResponse[]
             errors.forEach((e) => {
@@ -117,7 +115,6 @@ export default defineComponent({
                   icon: "info",
                 })
               }
-              console.log(e)
             })
           } else {
             $q.notify({
