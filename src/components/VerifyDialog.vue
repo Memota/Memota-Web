@@ -9,7 +9,7 @@
         <div class="text-h5">Verify your email</div>
         <div>You will need to verify your email to complete your registration.</div>
         <div><q-icon name="o_mail" style="font-size: 10em" /></div>
-        <q-form ref="resendForm">
+        <q-form ref="resendForm" @submit="resend">
           <q-input
             v-model="email"
             outlined
@@ -25,14 +25,7 @@
             ]"
           >
           </q-input>
-          <q-btn
-            :loading="registerLoading"
-            class="submit-button"
-            label="Resend"
-            type="submit"
-            color="primary"
-            @click="resend"
-          />
+          <q-btn :loading="registerLoading" class="submit-button" label="Resend" type="submit" color="primary" />
         </q-form>
       </q-card-section>
       <div class="bottom">

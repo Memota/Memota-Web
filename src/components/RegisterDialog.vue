@@ -5,7 +5,7 @@
         <div><q-btn round flat icon="arrow_back" @click="$router.go(-1)"></q-btn></div>
         <div class="nav-text text-h6">Register</div>
       </div>
-      <q-form ref="registerForm">
+      <q-form ref="registerForm" @submit="register">
         <q-input
           v-model="email"
           outlined
@@ -52,14 +52,7 @@
             />
           </template>
         </q-input>
-        <q-btn
-          :loading="registerLoading"
-          class="submit-button"
-          label="Register"
-          type="submit"
-          color="primary"
-          @click="register"
-        />
+        <q-btn :loading="registerLoading" class="submit-button" label="Register" type="submit" color="primary" />
       </q-form>
       <div class="bottom">
         <q-separator />
@@ -77,6 +70,7 @@ import { defineComponent, ref } from "vue"
 import { api } from "boot/axios"
 import { useQuasar, QForm } from "quasar"
 import { AxiosError } from "axios"
+import { useRouter } from "vue-router"
 
 interface ErrorResponse {
   value: string
@@ -90,6 +84,7 @@ export default defineComponent({
   name: "RegisterDialog",
   setup() {
     const $q = useQuasar()
+    const router = useRouter()
 
     const registerForm = ref<QForm>()
     const email = ref("")
@@ -106,6 +101,7 @@ export default defineComponent({
         .then((response) => {
           console.log(response)
           registerLoading.value = false
+          void router.push("verify")
         })
         .catch((e: AxiosError) => {
           console.log(e.response)
