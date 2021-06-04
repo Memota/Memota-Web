@@ -43,6 +43,7 @@
 import { defineComponent, ref } from "vue"
 import { api } from "boot/axios"
 import { useQuasar, QForm } from "quasar"
+import { AxiosError } from "axios"
 
 export default defineComponent({
   name: "VerifyDialog",
@@ -57,15 +58,34 @@ export default defineComponent({
       if (!(await resendForm.value?.validate())) return
       registerLoading.value = true
       let data = { email: email.value }
-      await api.post("/user/resend", data).catch((e) => {
-        console.log(e)
-        $q.notify({
-          color: "negative",
-          position: "top",
-          message: "Loading failed",
-          icon: "report_problem",
+      await api
+        .post("/user/resend", data)
+        .then(() => {
+          $q.notify({
+            color: "info",
+            position: "top",
+            message: "Email has been resent",
+            icon: "info",
+          })
         })
-      })
+        .catch((e: AxiosError) => {
+          let message = "Loading failed"
+
+          if (e.response?.data) {
+            if (e.response.status === 400 && !Array.isArray(e.response?.data)) {
+              message = "Email was not found or user is already verified"
+            } else if (e.response.status === 429) {
+              console.log(e.response?.data)
+              message = "You can only resend your verification email every 15 minutes"
+            }
+          }
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: message,
+            icon: "report_problem",
+          })
+        })
       registerLoading.value = false
     }
     return {
