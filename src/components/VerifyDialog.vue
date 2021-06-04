@@ -53,10 +53,6 @@ import { useQuasar, QForm } from "quasar"
 
 export default defineComponent({
   name: "VerifyDialog",
-  beforeRouteEnter(to, from, next) {
-    console.log(from)
-    next()
-  },
   setup() {
     const $q = useQuasar()
 

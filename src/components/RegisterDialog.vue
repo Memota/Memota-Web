@@ -88,10 +88,6 @@ interface ErrorResponse {
 
 export default defineComponent({
   name: "RegisterDialog",
-  beforeRouteEnter(to, from, next) {
-    console.log(from)
-    next()
-  },
   setup() {
     const $q = useQuasar()
 
