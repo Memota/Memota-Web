@@ -97,7 +97,7 @@ export default defineComponent({
       registerLoading.value = true
       let data = { email: email.value, username: username.value, password: password.value }
       api
-        .post("/user/register", data)
+        .post("/users/register", data)
         .then((response) => {
           registerLoading.value = false
           void router.push("verify")

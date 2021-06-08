@@ -18,7 +18,7 @@ export default defineComponent({
     const router = useRouter()
     if (route?.params.token) {
       void api
-        .post("/user/verify/" + route?.params.token.toString())
+        .post("/users/verify/" + route?.params.token.toString())
         .then(() => {
           $q.notify({
             color: "info",
