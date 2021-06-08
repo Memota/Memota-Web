@@ -1,6 +1,17 @@
 <template>
-  <p>Memota</p>
-  <router-view />
+  <q-layout view="hHh LpR fFf">
+    <q-header elevated>
+      <q-toolbar>
+        <q-btn flat round icon="menu" />
+        <q-toolbar-title>Memota</q-toolbar-title>
+        <q-btn stretch flat label="Login" @click="$router.push('register')" />
+      </q-toolbar>
+    </q-header>
+    <q-page-container>
+      <router-view />
+    </q-page-container>
+  </q-layout>
+  <router-view name="dialog" />
 </template>
 
 <script lang="ts">

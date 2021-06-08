@@ -1,10 +1,42 @@
 import { RouteRecordRaw } from "vue-router"
 
+const MainLayout = () => import("layouts/MainLayout.vue")
+const Index = () => import("pages/Index.vue")
+const RegisterDialog = () => import("components/RegisterDialog.vue")
+const VerifyDialog = () => import("components/VerifyDialog.vue")
+const VerifySpinnerDialog = () => import("components/VerifySpinnerDialog.vue")
+
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/Index.vue") }],
+    component: MainLayout,
+    children: [
+      {
+        path: "",
+        component: Index,
+      },
+      {
+        path: "register",
+        components: {
+          default: Index,
+          dialog: RegisterDialog,
+        },
+      },
+      {
+        path: "verify",
+        components: {
+          default: Index,
+          dialog: VerifyDialog,
+        },
+      },
+      {
+        path: "user/verify/:token",
+        components: {
+          default: Index,
+          dialog: VerifySpinnerDialog,
+        },
+      },
+    ],
   },
 
   // Always leave this as last one,

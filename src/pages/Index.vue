@@ -1,4 +1,7 @@
-<template><p>Index</p></template>
+<template>
+  <p>Index</p>
+  <router-view />
+</template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
