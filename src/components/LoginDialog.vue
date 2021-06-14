@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue"
+import { defineComponent, ref, onMounted, onUnmounted } from "vue"
 import { api } from "boot/axios"
 import { useQuasar, QForm } from "quasar"
 import { AxiosError } from "axios"
@@ -60,11 +60,19 @@ export default defineComponent({
     const password = ref("")
     const loginLoading = ref(false)
 
+    onMounted(() => {
+      window.addEventListener("logged-in", push)
+    })
+    onUnmounted(() => {
+      window.removeEventListener("logged-in", push)
+    })
+    const push = () => {
+      void router.push("/")
+    }
     const login = async () => {
       loginLoading.value = true
       await store.dispatch("user/login", { email: email.value, password: password.value })
       loginLoading.value = false
-      await router.push("/")
     }
     return {
       showPwd: ref(false),
