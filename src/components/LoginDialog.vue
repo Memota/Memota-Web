@@ -2,7 +2,9 @@
   <q-dialog v-model="test" persistent :maximized="$q.screen.xs || $q.screen.sm">
     <q-card>
       <div class="top">
-        <div><q-btn round flat icon="arrow_back" @click="$router.push('/')"></q-btn></div>
+        <div>
+          <q-btn round flat icon="arrow_back"></q-btn>
+        </div>
         <div class="nav-text text-h6">Login</div>
       </div>
       <q-form ref="loginForm" @submit="login">
@@ -35,6 +37,7 @@ import { api } from "boot/axios"
 import { useQuasar, QForm } from "quasar"
 import { AxiosError } from "axios"
 import { useRouter } from "vue-router"
+import { useStore } from "../store"
 
 interface ErrorResponse {
   value: string
@@ -49,6 +52,7 @@ export default defineComponent({
   setup() {
     const $q = useQuasar()
     const router = useRouter()
+    const store = useStore()
 
     const loginForm = ref<QForm>()
     const email = ref("")
@@ -57,7 +61,10 @@ export default defineComponent({
     const loginLoading = ref(false)
 
     const login = async () => {
-      if (!(await loginForm.value?.validate())) return
+      loginLoading.value = true
+      await store.dispatch("user/login", { email: email.value, password: password.value })
+      loginLoading.value = false
+      await router.push("/")
     }
     return {
       showPwd: ref(false),

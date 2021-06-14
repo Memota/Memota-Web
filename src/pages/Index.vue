@@ -1,6 +1,5 @@
 <template>
-  <p>Index {{ test }}</p>
-  <button @click="login">TestButton</button>
+  <p>Index</p>
   <router-view />
 </template>
 

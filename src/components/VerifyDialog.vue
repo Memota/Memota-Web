@@ -2,7 +2,7 @@
   <q-dialog v-model="test" persistent :maximized="$q.screen.xs || $q.screen.sm">
     <q-card>
       <div class="top">
-        <div><q-btn round flat icon="arrow_back" @click="$router.go(-1)"></q-btn></div>
+        <div><q-btn round flat icon="arrow_back"></q-btn></div>
         <div class="nav-text text-h6">Verify</div>
       </div>
       <q-card-section class="text-center">

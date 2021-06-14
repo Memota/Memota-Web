@@ -4,7 +4,6 @@
       <q-toolbar>
         <q-btn flat round icon="menu" />
         <q-toolbar-title>Memota</q-toolbar-title>
-        <q-btn stretch flat label="Login" @click="$router.push('register')" />
         <q-btn v-if="username !== ''" round flat>
           <q-avatar color="purple" text-color="white">{{ username.charAt(0) }}</q-avatar>
         </q-btn>
