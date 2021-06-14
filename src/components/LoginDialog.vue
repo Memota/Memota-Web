@@ -33,24 +33,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from "vue"
-import { api } from "boot/axios"
-import { useQuasar, QForm } from "quasar"
-import { AxiosError } from "axios"
+import { QForm } from "quasar"
 import { useRouter } from "vue-router"
 import { useStore } from "../store"
-
-interface ErrorResponse {
-  value: string
-  property: string
-  constraints: {
-    IsUniq: string
-  }
-}
 
 export default defineComponent({
   name: "LoginDialog",
   setup() {
-    const $q = useQuasar()
     const router = useRouter()
     const store = useStore()
 
