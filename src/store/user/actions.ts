@@ -26,6 +26,10 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
         })
       })
   },
+  logout({ commit }) {
+    localStorage.clear()
+    commit("clearAll")
+  },
   getProfile({ commit }) {
     const jwt: string = localStorage.getItem("jwt") || ""
     void api.get("/users/profile", { headers: { Authorization: "Bearer " + jwt } }).then((response) => {
