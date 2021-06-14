@@ -5,6 +5,9 @@
         <q-btn flat round icon="menu" />
         <q-toolbar-title>Memota</q-toolbar-title>
         <q-btn stretch flat label="Login" @click="$router.push('register')" />
+        <q-btn v-if="username !== ''" round flat
+          ><q-avatar color="purple" text-color="white">{{ username.charAt(0) }}</q-avatar></q-btn
+        >
       </q-toolbar>
     </q-header>
     <q-page-container>
@@ -15,12 +18,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
+import { computed, defineComponent } from "vue"
+import { useStore } from "../store"
 
 export default defineComponent({
   name: "MainLayout",
   setup() {
-    return {}
+    const store = useStore()
+    const username = computed((): string => {
+      return store.state.user.user.username
+    })
+    return { username }
   },
 })
 </script>

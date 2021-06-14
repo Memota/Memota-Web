@@ -1,10 +1,11 @@
 <template>
-  <p>Index</p>
+  <p>Index {{ test }}</p>
+  <button @click="login">TestButton</button>
   <router-view />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
+import { defineComponent, computed } from "vue"
 
 export default defineComponent({
   name: "PageIndex",
