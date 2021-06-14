@@ -2,7 +2,7 @@
   <q-dialog v-model="test" persistent :maximized="$q.screen.xs || $q.screen.sm">
     <q-card>
       <div class="top">
-        <div><q-btn round flat icon="arrow_back" @click="$router.go(-1)"></q-btn></div>
+        <div><q-btn round flat icon="arrow_back" @click="$router.push('/')"></q-btn></div>
         <div class="nav-text text-h6">Register</div>
       </div>
       <q-form ref="registerForm" @submit="register">
@@ -41,7 +41,7 @@
           :rules="[
             (val) => (val && val.length > 0) || 'Please enter your password',
             (val) => val.length <= 64 || 'Password must be 64 characters or less',
-            (val) => val.length >= 5 || 'Username must be at least 5 characters',
+            (val) => val.length >= 5 || 'Password must be at least 5 characters',
           ]"
         >
           <template #append>

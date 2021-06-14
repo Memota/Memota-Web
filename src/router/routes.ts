@@ -3,6 +3,7 @@ import { RouteRecordRaw } from "vue-router"
 const MainLayout = () => import("layouts/MainLayout.vue")
 const Index = () => import("pages/Index.vue")
 const RegisterDialog = () => import("components/RegisterDialog.vue")
+const LoginDialog = () => import("components/LoginDialog.vue")
 const VerifyDialog = () => import("components/VerifyDialog.vue")
 const VerifySpinnerDialog = () => import("components/VerifySpinnerDialog.vue")
 
@@ -23,6 +24,13 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: "login",
+        components: {
+          default: Index,
+          dialog: LoginDialog,
+        },
+      },
+      {
         path: "verify",
         components: {
           default: Index,
@@ -30,7 +38,7 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "user/verify/:token",
+        path: "users/verify/:token",
         components: {
           default: Index,
           dialog: VerifySpinnerDialog,
