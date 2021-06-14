@@ -9,12 +9,12 @@ interface Response {
 }
 
 const actions: ActionTree<UserStateInterface, StateInterface> = {
-  login({ commit, dispatch }, user) {
+  login({ dispatch }, user) {
     void api
       .post("/users/login", user)
       .then((response) => {
         const responseData = response.data as Response
-        commit("setJwt", responseData.token)
+        localStorage.setItem("jwt", responseData.token)
         void dispatch("getProfile")
       })
       .catch(() => {
@@ -26,8 +26,9 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
         })
       })
   },
-  getProfile({ commit, state }) {
-    void api.get("/users/profile", { headers: { Authorization: "Bearer " + state.jwt } }).then((response) => {
+  getProfile({ commit }) {
+    const jwt: string = localStorage.getItem("jwt") || ""
+    void api.get("/users/profile", { headers: { Authorization: "Bearer " + jwt } }).then((response) => {
       commit("setProfile", response.data)
     })
   },

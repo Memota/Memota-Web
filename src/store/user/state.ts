@@ -1,6 +1,5 @@
 export interface UserStateInterface {
   user: User
-  jwt: string
 }
 
 export interface User {
@@ -20,7 +19,6 @@ function state(): UserStateInterface {
       verified: false,
       role: "",
     },
-    jwt: "",
   }
 }
 

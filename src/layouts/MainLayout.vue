@@ -27,7 +27,9 @@ export default defineComponent({
     const router = useRouter()
     const store = useStore()
     const currentPath = router.currentRoute.value.path
-    if (!store.state.user.jwt && currentPath !== "/login" && currentPath !== "/register") {
+    if (localStorage.getItem("jwt")) {
+      void store.dispatch("user/getProfile")
+    } else if (currentPath !== "/login" && currentPath !== "/register") {
       void router.push("login")
     }
     const username = computed((): string => {
