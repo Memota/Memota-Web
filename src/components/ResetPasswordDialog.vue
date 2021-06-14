@@ -85,7 +85,9 @@ export default defineComponent({
           })
           .catch((e: AxiosError) => {
             let message = "Something went wrong"
-            if (!Array.isArray(e.response?.data)) {
+            if (e.response?.status === 401) {
+              message = e.response.data as unknown as string
+            } else if (!Array.isArray(e.response?.data)) {
               message = "Reset Token not found"
             }
             $q.notify({

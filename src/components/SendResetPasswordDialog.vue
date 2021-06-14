@@ -73,7 +73,7 @@ export default defineComponent({
         })
         .catch((e: AxiosError) => {
           let message = "Something went wrong"
-          if (e.response?.status === 401) {
+          if (e.response?.status === 401 || e.response?.status === 429) {
             message = e.response.data as string
           }
           $q.notify({
