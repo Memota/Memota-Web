@@ -18,6 +18,9 @@
             />
           </template>
         </q-input>
+        <p>
+          <router-link class="text-primary" to="reset">Forgot your password?</router-link>
+        </p>
         <q-btn :loading="loginLoading" class="submit-button" label="Login" type="submit" color="primary" />
       </q-form>
       <div class="bottom">

@@ -9,34 +9,19 @@
       </div>
       <q-form ref="resetForm" @submit="reset">
         <q-input
-          v-model="password"
+          v-model="email"
           outlined
-          :type="showPwd ? 'text' : 'password'"
-          label="Password"
+          type="email"
+          label="Email"
           :lazy-rules="true"
           :rules="[
-            (val) => (val && val.length > 0) || 'Please enter a new password',
-            (val) => val.length <= 64 || 'Password must be 64 characters or less',
-            (val) => val.length >= 5 || 'Password must be at least 5 characters',
+            (val) => (val && val.length > 0) || 'Please enter your mail address',
+            (val) => val.length <= 64 || 'Email must be 64 characters or less',
+            (val) =>
+              new RegExp('^([A-Za-z0-9_\\-.])+@([A-Za-z0-9_\\-.])+\\.([A-Za-z]{2,15})$').test(val) ||
+              'Mail address must be valid',
           ]"
-        >
-          <template #append>
-            <q-icon
-              :name="showPwd ? 'o_visibility' : 'o_visibility_off'"
-              class="cursor-pointer"
-              @click="showPwd = !showPwd"
-            />
-          </template>
-        </q-input>
-        <q-input
-          v-model="confirmPassword"
-          outlined
-          :type="showPwd ? 'text' : 'password'"
-          label="Password"
-          :lazy-rules="true"
-          :rules="[(val) => val === password || 'The passwords have to be matching']"
-        >
-        </q-input>
+        />
         <q-btn :loading="resetLoading" class="submit-button" label="Reset Password" type="submit" color="primary" />
       </q-form>
       <div class="bottom">
@@ -59,7 +44,7 @@ import { api } from "boot/axios"
 import { AxiosError } from "axios"
 
 export default defineComponent({
-  name: "ResetPasswordDialog",
+  name: "SendResetPasswordDialog",
   setup() {
     const router = useRouter()
     const route = useRoute()
@@ -67,49 +52,42 @@ export default defineComponent({
     const $q = useQuasar()
 
     const resetForm = ref<QForm>()
-    const password = ref("")
-    const confirmPassword = ref("")
+    const email = ref("")
     const resetLoading = ref(false)
 
     const reset = async () => {
-      if (route?.params.token) {
-        if (!(await resetForm.value?.validate())) return
-        resetLoading.value = true
+      if (!(await resetForm.value?.validate())) return
+      resetLoading.value = true
 
-        let data = { token: route.params.token, password: password.value }
-        void api
-          .post("/users/password-reset", data)
-          .then(() => {
-            resetLoading.value = false
-            void router.push("/login")
+      let data = { email: email.value }
+      void api
+        .post("/users/send-reset", data)
+        .then(() => {
+          resetLoading.value = false
+          $q.notify({
+            color: "info",
+            position: "top",
+            message: "Email has been sent",
+            icon: "info",
           })
-          .catch((e: AxiosError) => {
-            let message = "Something went wrong"
-            if (!Array.isArray(e.response?.data)) {
-              message = "Reset Token not found"
-            }
-            $q.notify({
-              color: "negative",
-              position: "top",
-              message: message,
-              icon: "report_problem",
-            })
-            resetLoading.value = false
-          })
-      } else {
-        $q.notify({
-          color: "negative",
-          position: "top",
-          message: "Reset Token invalid",
-          icon: "report_problem",
         })
-      }
+        .catch((e: AxiosError) => {
+          let message = "Something went wrong"
+          if (e.response?.status === 401) {
+            message = e.response.data as string
+          }
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: message,
+            icon: "report_problem",
+          })
+          resetLoading.value = false
+        })
     }
 
     return {
-      showPwd: ref(false),
-      password,
-      confirmPassword,
+      email,
       reset,
       resetLoading,
       resetForm,
