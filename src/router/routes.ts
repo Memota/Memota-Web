@@ -6,6 +6,7 @@ const RegisterDialog = () => import("components/RegisterDialog.vue")
 const LoginDialog = () => import("components/LoginDialog.vue")
 const VerifyDialog = () => import("components/VerifyDialog.vue")
 const VerifySpinnerDialog = () => import("components/VerifySpinnerDialog.vue")
+const ResetPasswordDialog = () => import("components/ResetPasswordDialog.vue")
 
 const routes: RouteRecordRaw[] = [
   {
@@ -42,6 +43,13 @@ const routes: RouteRecordRaw[] = [
         components: {
           default: Index,
           dialog: VerifySpinnerDialog,
+        },
+      },
+      {
+        path: "users/password-reset/:token",
+        components: {
+          default: Index,
+          dialog: ResetPasswordDialog,
         },
       },
     ],
