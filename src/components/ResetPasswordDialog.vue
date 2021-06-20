@@ -78,8 +78,14 @@ export default defineComponent({
 
         let data = { token: route.params.token, password: password.value }
         void api
-          .post("/users/password-reset", data)
+          .post("/users/reset", data)
           .then(() => {
+            $q.notify({
+              color: "info",
+              position: "top",
+              message: "Password has been reset",
+              icon: "info",
+            })
             resetLoading.value = false
             void router.push("/login")
           })

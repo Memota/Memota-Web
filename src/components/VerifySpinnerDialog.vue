@@ -26,7 +26,7 @@ export default defineComponent({
             message: "Successfully verified",
             icon: "info",
           })
-          void router.push("/")
+          void router.push("/login")
         })
         .catch(() => {
           $q.notify({

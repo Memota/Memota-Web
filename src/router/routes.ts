@@ -47,7 +47,7 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "users/password-reset/:token",
+        path: "users/reset/:token",
         components: {
           default: Index,
           dialog: ResetPasswordDialog,
