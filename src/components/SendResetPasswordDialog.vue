@@ -61,7 +61,7 @@ export default defineComponent({
 
       let data = { email: email.value }
       void api
-        .post("/users/send-reset", data)
+        .post("/auth/send-reset", data)
         .then(() => {
           resetLoading.value = false
           $q.notify({

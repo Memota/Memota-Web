@@ -40,14 +40,14 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "users/verify/:token",
+        path: "auth/verify/:token",
         components: {
           default: Index,
           dialog: VerifySpinnerDialog,
         },
       },
       {
-        path: "users/reset/:token",
+        path: "auth/reset/:token",
         components: {
           default: Index,
           dialog: ResetPasswordDialog,

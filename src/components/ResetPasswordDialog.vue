@@ -78,7 +78,7 @@ export default defineComponent({
 
         let data = { token: route.params.token, password: password.value }
         void api
-          .post("/users/reset", data)
+          .post("/auth/reset", data)
           .then(() => {
             $q.notify({
               color: "info",

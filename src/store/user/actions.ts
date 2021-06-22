@@ -12,7 +12,7 @@ interface Response {
 const actions: ActionTree<UserStateInterface, StateInterface> = {
   login({ dispatch }, user) {
     void api
-      .post("/users/login", user)
+      .post("/auth/login", user)
       .then((response) => {
         const responseData = response.data as Response
         localStorage.setItem("jwt", responseData.token)

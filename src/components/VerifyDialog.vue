@@ -59,7 +59,7 @@ export default defineComponent({
       registerLoading.value = true
       let data = { email: email.value }
       await api
-        .post("/users/resend", data)
+        .post("/auth/resend", data)
         .then(() => {
           $q.notify({
             color: "info",
