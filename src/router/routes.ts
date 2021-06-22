@@ -3,8 +3,11 @@ import { RouteRecordRaw } from "vue-router"
 const MainLayout = () => import("layouts/MainLayout.vue")
 const Index = () => import("pages/Index.vue")
 const RegisterDialog = () => import("components/RegisterDialog.vue")
+const LoginDialog = () => import("components/LoginDialog.vue")
 const VerifyDialog = () => import("components/VerifyDialog.vue")
 const VerifySpinnerDialog = () => import("components/VerifySpinnerDialog.vue")
+const ResetPasswordDialog = () => import("components/ResetPasswordDialog.vue")
+const SendResetPasswordDialog = () => import("components/SendResetPasswordDialog.vue")
 
 const routes: RouteRecordRaw[] = [
   {
@@ -23,6 +26,13 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
+        path: "login",
+        components: {
+          default: Index,
+          dialog: LoginDialog,
+        },
+      },
+      {
         path: "verify",
         components: {
           default: Index,
@@ -30,10 +40,24 @@ const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: "user/verify/:token",
+        path: "auth/verify/:token",
         components: {
           default: Index,
           dialog: VerifySpinnerDialog,
+        },
+      },
+      {
+        path: "auth/reset/:token",
+        components: {
+          default: Index,
+          dialog: ResetPasswordDialog,
+        },
+      },
+      {
+        path: "reset",
+        components: {
+          default: Index,
+          dialog: SendResetPasswordDialog,
         },
       },
     ],

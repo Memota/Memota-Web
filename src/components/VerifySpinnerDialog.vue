@@ -18,7 +18,7 @@ export default defineComponent({
     const router = useRouter()
     if (route?.params.token) {
       void api
-        .post("/users/verify/" + route?.params.token.toString())
+        .post("/auth/verify/" + route?.params.token.toString())
         .then(() => {
           $q.notify({
             color: "info",
@@ -26,7 +26,7 @@ export default defineComponent({
             message: "Successfully verified",
             icon: "info",
           })
-          void router.push("/")
+          void router.push("/login")
         })
         .catch(() => {
           $q.notify({
