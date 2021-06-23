@@ -76,6 +76,7 @@ export default defineComponent({
   background-color: #fafafa;
   width: 100%;
   height: 100%;
+  min-height: 100vh;
   padding: 5px;
 }
 @media (min-width: $breakpoint-xl-min) {

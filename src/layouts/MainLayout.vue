@@ -23,7 +23,7 @@
         </q-btn>
       </q-toolbar>
     </q-header>
-    <q-page-container style="height: 100vh">
+    <q-page-container style="height: 100%">
       <router-view />
     </q-page-container>
   </q-layout>
