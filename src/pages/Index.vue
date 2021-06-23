@@ -25,12 +25,13 @@
 </template>
 
 <script lang="ts">
-import { useStore } from "../store"
 import { defineComponent, computed, onMounted, onUnmounted, ref } from "vue"
 import { useRouter } from "vue-router"
-import { Note } from "../store/note/state"
-import { api } from "src/boot/axios"
 import { useQuasar } from "quasar"
+
+import { api } from "src/boot/axios"
+import { useStore } from "../store"
+import { Note } from "../store/note/state"
 
 export default defineComponent({
   name: "PageIndex",

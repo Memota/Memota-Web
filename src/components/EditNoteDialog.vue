@@ -20,9 +20,10 @@
 import { defineComponent, ref, onMounted } from "vue"
 import { useQuasar } from "quasar"
 import { useRouter, useRoute } from "vue-router"
-import { useStore } from "../store"
-import { Note } from "src/store/note/state"
+
 import { api } from "src/boot/axios"
+import { Note } from "src/store/note/state"
+import { useStore } from "../store"
 
 export default defineComponent({
   name: "EditNoteDialog",
@@ -121,11 +122,13 @@ export default defineComponent({
     height: 60%;
   }
 }
+
 .q-card {
   display: flex;
   flex-direction: column;
   border-radius: 8px;
 }
+
 .top {
   display: flex;
   padding-top: 5px;
@@ -133,13 +136,16 @@ export default defineComponent({
   width: 100%;
   padding-bottom: 0px;
 }
+
 .nav-text {
   margin-top: 5px;
 }
+
 .title {
   padding-top: 0px;
   padding-bottom: 0px;
 }
+
 .title input {
   width: 100%;
   border-width: 0px;
@@ -147,10 +153,12 @@ export default defineComponent({
   font-size: 24px;
   font-weight: bold;
 }
+
 .title input:focus,
 .text textarea:focus {
   outline: none;
 }
+
 .text {
   padding-top: 0px;
   height: 100%;
@@ -158,6 +166,7 @@ export default defineComponent({
   flex-grow: 1;
   padding-bottom: 0px;
 }
+
 .text textarea {
   border-width: 0px;
   width: 100%;
@@ -166,6 +175,7 @@ export default defineComponent({
   resize: none;
   height: 100%;
 }
+
 .buttons {
   margin-left: auto;
 }
