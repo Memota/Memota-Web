@@ -16,6 +16,7 @@
         </q-card>
       </div>
     </div>
+    <div v-if="impostor" v-masonry-tile class="item col-xs-12 col-sm-6 col-md-4 col-lg-3 impostor-card"></div>
     <q-page-sticky position="bottom-right" :offset="[20, 20]">
       <q-btn fab icon="add" color="accent" @click="createNote" />
     </q-page-sticky>
@@ -25,7 +26,7 @@
 
 <script lang="ts">
 import { useStore } from "../store"
-import { defineComponent, computed } from "vue"
+import { defineComponent, computed, onMounted, onUnmounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import { Note } from "../store/note/state"
 import { api } from "src/boot/axios"
@@ -66,7 +67,19 @@ export default defineComponent({
       }
       creating = false
     }
-    return { notes, createNote }
+
+    const impostor = ref(true)
+    const refreshGrid = () => {
+      impostor.value = !impostor.value
+    }
+    onMounted(() => {
+      window.addEventListener("updated-notes", refreshGrid)
+    })
+    onUnmounted(() => {
+      window.removeEventListener("updated-notes", refreshGrid)
+    })
+
+    return { notes, createNote, impostor }
   },
 })
 </script>
@@ -96,5 +109,8 @@ export default defineComponent({
 .note-title {
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.impostor-card {
+  height: 0px;
 }
 </style>
