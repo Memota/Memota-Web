@@ -3,7 +3,9 @@ import { InjectionKey } from "vue"
 import { createStore, Store as VuexStore, useStore as vuexUseStore } from "vuex"
 
 import user from "./user"
+import note from "./note"
 import { UserStateInterface } from "./user/state"
+import { NoteStateInterface } from "./note/state"
 
 /*
  * If not building with SSR mode, you can
@@ -19,6 +21,7 @@ export interface StateInterface {
   // example: ExampleStateInterface;
   // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
   user: UserStateInterface
+  note: NoteStateInterface
 }
 
 // provide typings for `this.$store`
@@ -35,6 +38,7 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore<StateInterface>({
     modules: {
       user,
+      note,
     },
 
     // enable strict mode (adds overhead!)

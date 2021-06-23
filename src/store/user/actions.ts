@@ -13,11 +13,12 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
   login({ dispatch }, user) {
     void api
       .post("/auth/login", user)
-      .then((response) => {
+      .then(async (response) => {
         const responseData = response.data as Response
         localStorage.setItem("jwt", responseData.token)
-        void dispatch("getProfile")
+        await dispatch("getProfile")
         window.dispatchEvent(new CustomEvent("logged-in"))
+        await dispatch("note/getNotes", null, { root: true })
       })
       .catch((e: AxiosError) => {
         let message = "Something went wrong"

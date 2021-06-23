@@ -1,15 +1,47 @@
 <template>
   <p>Index</p>
+  <div class="q-pa-md">
+    <div class="row items-start example-container">
+      <div v-for="note in notes" :key="note.id" tabindex="0" class="col-xs-12 col-sm-6 col-md-4 col-lg-3 note-card">
+        <q-card v-ripple class="cursor-pointer">
+          <q-card-section>
+            <div class="text-h6">{{ note.title }}</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            {{ note.text }}
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+  </div>
   <router-view />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
+import { useStore } from "../store"
+import { defineComponent, computed } from "vue"
+import { Note } from "../store/note/state"
 
 export default defineComponent({
   name: "PageIndex",
   setup() {
-    return {}
+    const store = useStore()
+    void store.dispatch("note/getNotes")
+    const notes = computed((): Note[] => {
+      return store.state.note.notes
+    })
+    return { notes }
   },
 })
 </script>
+
+<style scoped lang="scss">
+.note-card {
+  padding: 8px;
+}
+.note-card > .q-card {
+  overflow: hidden;
+  max-height: 400px;
+}
+</style>
