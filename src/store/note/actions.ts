@@ -3,7 +3,6 @@ import { StateInterface } from "../index"
 import { NoteStateInterface } from "./state"
 import { api } from "boot/axios"
 import { Notify } from "quasar"
-import { AxiosError } from "axios"
 
 const actions: ActionTree<NoteStateInterface, StateInterface> = {
   getNotes({ commit }) {
@@ -13,7 +12,7 @@ const actions: ActionTree<NoteStateInterface, StateInterface> = {
       .then((response) => {
         commit("setNotes", response.data)
       })
-      .catch((e: AxiosError) => {
+      .catch(() => {
         Notify.create({
           color: "negative",
           position: "top",

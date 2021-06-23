@@ -26,7 +26,7 @@
 <script lang="ts">
 import { useStore } from "../store"
 import { defineComponent, computed } from "vue"
-import { useRouter, useRoute } from "vue-router"
+import { useRouter } from "vue-router"
 import { Note } from "../store/note/state"
 import { api } from "src/boot/axios"
 import { useQuasar } from "quasar"

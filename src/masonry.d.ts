@@ -1,6 +1,6 @@
 declare module "vue-masonry/src/masonry-vue3.plugin" {
-  import Vue, { PluginFunction } from "vue"
+  import { PluginFunction } from "vue"
   export class VueMasonryPlugin {
-    static install: PluginFunction<never>
+    static install: PluginFunction
   }
 }

@@ -17,16 +17,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted, computed } from "vue"
-import { QForm, useQuasar } from "quasar"
+import { defineComponent, ref, onMounted } from "vue"
+import { useQuasar } from "quasar"
 import { useRouter, useRoute } from "vue-router"
 import { useStore } from "../store"
-import { route } from "quasar/wrappers"
 import { Note } from "src/store/note/state"
-import { GetterTree } from "vuex"
-import router from "src/router"
 import { api } from "src/boot/axios"
-import { AxiosError } from "axios"
 
 export default defineComponent({
   name: "EditNoteDialog",
@@ -172,7 +168,5 @@ export default defineComponent({
 }
 .buttons {
   margin-left: auto;
-}
-.delete-note {
 }
 </style>
