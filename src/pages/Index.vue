@@ -9,7 +9,7 @@
       >
         <q-card v-ripple class="cursor-pointer" @click="$router.push('/edit/' + note.id)">
           <q-card-section>
-            <div class="text-h6">{{ note.title }}</div>
+            <div class="text-h6 note-title">{{ note.title }}</div>
           </q-card-section>
 
           <q-card-section class="q-pt-none"> {{ note.text }} </q-card-section>
@@ -17,7 +17,7 @@
       </div>
     </div>
     <q-page-sticky position="bottom-right" :offset="[20, 20]">
-      <q-btn fab icon="add" color="accent" />
+      <q-btn fab icon="add" color="accent" @click="createNote" />
     </q-page-sticky>
   </div>
   <router-view />
@@ -26,17 +26,47 @@
 <script lang="ts">
 import { useStore } from "../store"
 import { defineComponent, computed } from "vue"
+import { useRouter, useRoute } from "vue-router"
 import { Note } from "../store/note/state"
+import { api } from "src/boot/axios"
+import { useQuasar } from "quasar"
 
 export default defineComponent({
   name: "PageIndex",
   setup() {
     const store = useStore()
+    const router = useRouter()
+    const $q = useQuasar()
     void store.dispatch("note/getNotes")
     const notes = computed((): Note[] => {
       return store.state.note.notes
     })
-    return { notes }
+    let creating = false
+    const createNote = async () => {
+      const jwt: string = localStorage.getItem("jwt") || ""
+      if (creating) return
+      creating = true
+      try {
+        const response = await api.post(
+          "/notes/",
+          { text: "", title: "" },
+          {
+            headers: { Authorization: "Bearer " + jwt },
+          },
+        )
+        const note = response.data as Note
+        await router.push("/edit/" + note.id)
+      } catch (err) {
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Something went wrong",
+          icon: "report_problem",
+        })
+      }
+      creating = false
+    }
+    return { notes, createNote }
   },
 })
 </script>
@@ -46,6 +76,7 @@ export default defineComponent({
   background-color: #fafafa;
   width: 100%;
   height: 100%;
+  padding: 5px;
 }
 @media (min-width: $breakpoint-xl-min) {
   .notes {
@@ -54,10 +85,15 @@ export default defineComponent({
   }
 }
 .note-card {
-  padding: 8px;
+  padding: 5px;
 }
 .note-card > .q-card {
   overflow: hidden;
   max-height: 400px;
+  white-space: pre-wrap;
+}
+.note-title {
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 </style>

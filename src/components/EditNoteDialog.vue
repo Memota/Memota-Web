@@ -1,15 +1,17 @@
 <template>
-  <q-dialog v-model="test" persistent :maximized="$q.screen.xs || $q.screen.sm">
+  <q-dialog v-model="test" :maximized="$q.screen.xs || $q.screen.sm" @before-hide="goBack">
     <q-card>
       <q-card-section class="top">
         <div>
-          <q-btn round flat icon="arrow_back"></q-btn>
+          <q-btn round flat icon="arrow_back" @click="goBack"></q-btn>
         </div>
         <div class="nav-text text-h6">Edit Note</div>
-        <div class="buttons"><q-btn flat round icon="o_delete" class="delete-note" @click="deleteNote" /></div>
+        <div class="buttons">
+          <q-btn flat round icon="o_delete" color="negative" class="delete-note" @click="deleteNote" />
+        </div>
       </q-card-section>
-      <q-card-section class="title"> <input v-model="title" /> </q-card-section>
-      <q-card-section class="text"><textarea v-model="text" /></q-card-section>
+      <q-card-section class="title"> <input v-model="title" maxlength="50" placeholder="Title" /> </q-card-section>
+      <q-card-section class="text"><textarea v-model="text" maxlength="10000" /></q-card-section>
     </q-card>
   </q-dialog>
 </template>
@@ -34,11 +36,12 @@ export default defineComponent({
     const router = useRouter()
     const $q = useQuasar()
 
-    const title = ref()
-    const text = ref()
+    const title = ref<string>()
+    const text = ref<string>()
+
+    let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
     onMounted(async () => {
-      let note = store.state.note.notes.find((note) => note.id === route.params.id)
       if (!note) {
         const jwt: string = localStorage.getItem("jwt") || ""
         try {
@@ -60,7 +63,6 @@ export default defineComponent({
         await api.delete("/notes/" + (route.params.id as string), {
           headers: { Authorization: "Bearer " + jwt },
         })
-        // void store.dispatch("note/getNotes")
         store.commit("note/deleteNote", route.params.id)
         void router.push("/")
       } catch (err) {
@@ -73,11 +75,43 @@ export default defineComponent({
       }
     }
 
+    const patchNote = async () => {
+      const jwt: string = localStorage.getItem("jwt") || ""
+      try {
+        await api.patch(
+          "/notes/" + (route.params.id as string),
+          { text: text.value, title: title.value },
+          {
+            headers: { Authorization: "Bearer " + jwt },
+          },
+        )
+        await store.dispatch("note/getNotes")
+      } catch (err) {
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Something went wrong",
+          icon: "report_problem",
+        })
+      }
+    }
+
+    const goBack = async () => {
+      if (text.value == undefined || (text.value === "" && title.value === "")) {
+        await deleteNote()
+      } else if (text.value !== note?.text || title.value !== note?.title) {
+        void patchNote()
+      }
+      void router.push("/")
+    }
+
     return {
       test: ref(true),
       title,
       text,
       deleteNote,
+      patchNote,
+      goBack,
     }
   },
 })
