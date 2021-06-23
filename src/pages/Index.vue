@@ -7,7 +7,7 @@
         v-masonry-tile
         class="item col-xs-12 col-sm-6 col-md-4 col-lg-3 note-card"
       >
-        <q-card v-ripple class="cursor-pointer">
+        <q-card v-ripple class="cursor-pointer" @click="$router.push('/edit/' + note.id)">
           <q-card-section>
             <div class="text-h6">{{ note.title }}</div>
           </q-card-section>
@@ -16,24 +16,10 @@
         </q-card>
       </div>
     </div>
+    <q-page-sticky position="bottom-right" :offset="[20, 20]">
+      <q-btn fab icon="add" color="accent" />
+    </q-page-sticky>
   </div>
-  <!--
-  <div class="q-pa-md">
-    <div class="row items-start example-container">
-      <div v-for="note in notes" :key="note.id" tabindex="0" class="col-xs-12 col-sm-6 col-md-4 col-lg-3 note-card">
-        <q-card v-ripple class="cursor-pointer">
-          <q-card-section>
-            <div class="text-h6">{{ note.title }}</div>
-          </q-card-section>
-
-          <q-card-section class="q-pt-none">
-            {{ note.text }}
-          </q-card-section>
-        </q-card>
-      </div>
-    </div>
-  </div> -->
-
   <router-view />
 </template>
 

@@ -12,7 +12,6 @@ const actions: ActionTree<NoteStateInterface, StateInterface> = {
       .get("/notes", { headers: { Authorization: "Bearer " + jwt } })
       .then((response) => {
         commit("setNotes", response.data)
-        console.log(response.data)
       })
       .catch((e: AxiosError) => {
         Notify.create({

@@ -6,6 +6,7 @@
           <q-btn round flat icon="arrow_back"></q-btn>
         </div>
         <div class="nav-text text-h6">Edit Note</div>
+        <div class="buttons"><q-btn flat round icon="o_delete" class="delete-note" @click="deleteNote" /></div>
       </q-card-section>
       <q-card-section class="title"> <input v-model="title" /> </q-card-section>
       <q-card-section class="text"><textarea v-model="text" /></q-card-section>
@@ -14,22 +15,69 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from "vue"
-import { QForm } from "quasar"
-import { useRouter } from "vue-router"
+import { defineComponent, ref, onMounted, onUnmounted, computed } from "vue"
+import { QForm, useQuasar } from "quasar"
+import { useRouter, useRoute } from "vue-router"
 import { useStore } from "../store"
+import { route } from "quasar/wrappers"
+import { Note } from "src/store/note/state"
+import { GetterTree } from "vuex"
+import router from "src/router"
+import { api } from "src/boot/axios"
+import { AxiosError } from "axios"
 
 export default defineComponent({
   name: "EditNoteDialog",
   setup() {
-    const router = useRouter()
     const store = useStore()
+    const route = useRoute()
+    const router = useRouter()
+    const $q = useQuasar()
 
-    const title = ref("Title")
+    const title = ref()
+    const text = ref()
+
+    onMounted(async () => {
+      let note = store.state.note.notes.find((note) => note.id === route.params.id)
+      if (!note) {
+        const jwt: string = localStorage.getItem("jwt") || ""
+        try {
+          const response = await api.get("/notes/" + (route.params.id as string), {
+            headers: { Authorization: "Bearer " + jwt },
+          })
+          note = response.data as Note
+        } catch (err) {
+          void router.push("/404")
+        }
+      }
+      title.value = note?.title
+      text.value = note?.text
+    })
+
+    const deleteNote = async () => {
+      const jwt: string = localStorage.getItem("jwt") || ""
+      try {
+        await api.delete("/notes/" + (route.params.id as string), {
+          headers: { Authorization: "Bearer " + jwt },
+        })
+        // void store.dispatch("note/getNotes")
+        store.commit("note/deleteNote", route.params.id)
+        void router.push("/")
+      } catch (err) {
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Something went wrong",
+          icon: "report_problem",
+        })
+      }
+    }
 
     return {
       test: ref(true),
       title,
+      text,
+      deleteNote,
     }
   },
 })
@@ -87,5 +135,10 @@ export default defineComponent({
   font-size: 18px;
   resize: none;
   height: 100%;
+}
+.buttons {
+  margin-left: auto;
+}
+.delete-note {
 }
 </style>
