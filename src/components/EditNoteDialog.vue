@@ -94,7 +94,7 @@ export default defineComponent({
     }
 
     const goBack = async () => {
-      if (text.value == undefined || (text.value === "" && title.value === "")) {
+      if ((text.value === "" || text.value == undefined) && (title.value === "" || title.value == undefined)) {
         await deleteNote()
       } else if (text.value !== note?.text || title.value !== note?.title) {
         void patchNote()
