@@ -32,8 +32,9 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue"
-import { useStore } from "../store"
 import { useRouter } from "vue-router"
+
+import { useStore } from "../store"
 
 export default defineComponent({
   name: "MainLayout",

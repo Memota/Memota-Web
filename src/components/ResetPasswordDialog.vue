@@ -54,7 +54,6 @@
 import { defineComponent, ref } from "vue"
 import { QForm, useQuasar } from "quasar"
 import { useRouter, useRoute } from "vue-router"
-import { useStore } from "../store"
 import { api } from "boot/axios"
 import { AxiosError } from "axios"
 
@@ -63,7 +62,6 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const store = useStore()
     const $q = useQuasar()
 
     const resetForm = ref<QForm>()

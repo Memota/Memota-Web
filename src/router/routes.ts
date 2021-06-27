@@ -8,6 +8,7 @@ const VerifyDialog = () => import("components/VerifyDialog.vue")
 const VerifySpinnerDialog = () => import("components/VerifySpinnerDialog.vue")
 const ResetPasswordDialog = () => import("components/ResetPasswordDialog.vue")
 const SendResetPasswordDialog = () => import("components/SendResetPasswordDialog.vue")
+const EditNoteDialog = () => import("components/EditNoteDialog.vue")
 
 const routes: RouteRecordRaw[] = [
   {
@@ -58,6 +59,13 @@ const routes: RouteRecordRaw[] = [
         components: {
           default: Index,
           dialog: SendResetPasswordDialog,
+        },
+      },
+      {
+        path: "edit/:id",
+        components: {
+          default: Index,
+          dialog: EditNoteDialog,
         },
       },
     ],

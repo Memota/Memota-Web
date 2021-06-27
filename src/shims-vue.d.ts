@@ -4,3 +4,9 @@ declare module "*.vue" {
   const component: ComponentOptions
   export default component
 }
+
+import Vue from "vue"
+
+declare module "vue" {
+  export type PluginFunction = (app: Vue.App, ...options: unknown[]) => unknown
+}
