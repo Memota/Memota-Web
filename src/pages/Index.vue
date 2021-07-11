@@ -39,7 +39,9 @@ export default defineComponent({
     const store = useStore()
     const router = useRouter()
     const $q = useQuasar()
-    void store.dispatch("note/getNotes")
+    if (localStorage.getItem("jwt")) {
+      void store.dispatch("note/getNotes")
+    }
     const notes = computed((): Note[] => {
       return store.state.note.notes
     })
