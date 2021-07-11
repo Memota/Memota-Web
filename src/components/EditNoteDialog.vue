@@ -8,29 +8,7 @@
         <div class="nav-text text-h6">Edit Note</div>
         <div class="buttons">
           <q-btn flat round icon="o_palette">
-            <q-popup-proxy>
-              <div class="color-picker">
-                <q-color
-                  v-model="color"
-                  no-header
-                  no-footer
-                  default-view="palette"
-                  :palette="[
-                    '#FFFFFF',
-                    '#ff9999',
-                    '#ffcc99',
-                    '#ffff99',
-                    '#99ff99',
-                    '#99ffff',
-                    '#99ccff',
-                    '#9999ff',
-                    '#cc99ff',
-                    '#ff99ff',
-                  ]"
-                  class="color-picker"
-                />
-              </div>
-            </q-popup-proxy>
+            <color-picker></color-picker>
           </q-btn>
           <q-btn flat round icon="o_delete" color="negative" @click="deleteNote" />
         </div>
@@ -49,9 +27,12 @@ import { useRouter, useRoute } from "vue-router"
 import { api } from "src/boot/axios"
 import { Note } from "src/store/note/state"
 import { useStore } from "../store"
+import ColorPicker from "src/components/ColorPicker.vue"
 
 export default defineComponent({
   name: "EditNoteDialog",
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  components: { ColorPicker },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -143,20 +124,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.color-picker {
-  max-width: 350px;
-  width: 350px;
-}
-
 @media (min-width: $breakpoint-md-min) {
   .q-card {
     width: 800px;
     max-width: 800px;
     height: 60%;
-  }
-  .color-picker {
-    max-width: 500px;
-    width: 500px;
   }
 }
 

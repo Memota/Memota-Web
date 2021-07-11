@@ -7,6 +7,7 @@ const emptyUser: User = {
   email: "",
   verified: false,
   role: "",
+  noteColors: ["#ffffff"],
 }
 
 const mutation: MutationTree<UserStateInterface> = {
@@ -15,6 +16,9 @@ const mutation: MutationTree<UserStateInterface> = {
   },
   clearAll(state: UserStateInterface) {
     Object.assign(state.user, emptyUser)
+  },
+  setColors(state: UserStateInterface, colors: string[]) {
+    state.user.noteColors = colors
   },
 }
 

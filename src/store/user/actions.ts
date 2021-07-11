@@ -9,6 +9,10 @@ interface Response {
   token: string
 }
 
+interface ColorResponse {
+  noteColors: string[]
+}
+
 const actions: ActionTree<UserStateInterface, StateInterface> = {
   login({ dispatch }, user) {
     void api
@@ -42,7 +46,18 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
     const jwt: string = localStorage.getItem("jwt") || ""
     void api.get("/users/profile", { headers: { Authorization: "Bearer " + jwt } }).then((response) => {
       commit("setProfile", response.data)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      console.log(response.data.noteColors)
     })
+  },
+  patchNoteColors({ commit }, colors: string[]) {
+    const jwt: string = localStorage.getItem("jwt") || ""
+    void api
+      .patch("/users/profile", { noteColors: colors }, { headers: { Authorization: "Bearer " + jwt } })
+      .then((response) => {
+        const colorResponse = response.data as ColorResponse
+        commit("setColors", colorResponse.noteColors)
+      })
   },
 }
 
