@@ -10,6 +10,10 @@ const mutation: MutationTree<NoteStateInterface> = {
   deleteNote(state: NoteStateInterface, id: string) {
     state.notes = state.notes.filter((note) => note.id !== id)
   },
+  clearAll(state: NoteStateInterface) {
+    // clear all the notes
+    state.notes = []
+  },
 }
 
 export default mutation

@@ -36,6 +36,7 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
   logout({ commit }) {
     localStorage.clear()
     commit("clearAll")
+    commit("note/clearAll", null, { root: true })
   },
   getProfile({ commit }) {
     const jwt: string = localStorage.getItem("jwt") || ""
