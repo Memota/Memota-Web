@@ -1,13 +1,38 @@
 <template>
   <q-dialog v-model="test" :maximized="$q.screen.xs || $q.screen.sm" @before-hide="goBack">
-    <q-card>
+    <q-card :style="'background-color:' + color">
       <q-card-section class="top">
         <div>
           <q-btn round flat icon="arrow_back" @click="goBack"></q-btn>
         </div>
         <div class="nav-text text-h6">Edit Note</div>
         <div class="buttons">
-          <q-btn flat round icon="o_delete" color="negative" class="delete-note" @click="deleteNote" />
+          <q-btn flat round icon="o_palette">
+            <q-popup-proxy>
+              <div class="color-picker">
+                <q-color
+                  v-model="color"
+                  no-header
+                  no-footer
+                  default-view="palette"
+                  :palette="[
+                    '#FFFFFF',
+                    '#ff9999',
+                    '#ffcc99',
+                    '#ffff99',
+                    '#99ff99',
+                    '#99ffff',
+                    '#99ccff',
+                    '#9999ff',
+                    '#cc99ff',
+                    '#ff99ff',
+                  ]"
+                  class="color-picker"
+                />
+              </div>
+            </q-popup-proxy>
+          </q-btn>
+          <q-btn flat round icon="o_delete" color="negative" @click="deleteNote" />
         </div>
       </q-card-section>
       <q-card-section class="title"> <input v-model="title" maxlength="50" placeholder="Title" /> </q-card-section>
@@ -35,6 +60,7 @@ export default defineComponent({
 
     const title = ref<string>()
     const text = ref<string>()
+    const color = ref<string>()
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -52,6 +78,7 @@ export default defineComponent({
       }
       title.value = note?.title
       text.value = note?.text
+      color.value = note?.color
     })
 
     const deleteNote = async () => {
@@ -77,7 +104,7 @@ export default defineComponent({
       try {
         await api.patch(
           "/notes/" + (route.params.id as string),
-          { text: text.value, title: title.value },
+          { text: text.value, title: title.value, color: color.value },
           {
             headers: { Authorization: "Bearer " + jwt },
           },
@@ -96,7 +123,7 @@ export default defineComponent({
     const goBack = async () => {
       if ((text.value === "" || text.value == undefined) && (title.value === "" || title.value == undefined)) {
         await deleteNote()
-      } else if (text.value !== note?.text || title.value !== note?.title) {
+      } else if (text.value !== note?.text || title.value !== note?.title || color.value !== note?.color) {
         void patchNote()
       }
       void router.push("/")
@@ -106,6 +133,7 @@ export default defineComponent({
       test: ref(true),
       title,
       text,
+      color,
       deleteNote,
       patchNote,
       goBack,
@@ -115,11 +143,20 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.color-picker {
+  max-width: 350px;
+  width: 350px;
+}
+
 @media (min-width: $breakpoint-md-min) {
   .q-card {
     width: 800px;
     max-width: 800px;
     height: 60%;
+  }
+  .color-picker {
+    max-width: 500px;
+    width: 500px;
   }
 }
 
@@ -147,6 +184,7 @@ export default defineComponent({
 }
 
 .title input {
+  background-color: transparent;
   width: 100%;
   border-width: 0px;
   border: none;
@@ -174,6 +212,7 @@ export default defineComponent({
   font-size: 18px;
   resize: none;
   height: 100%;
+  background-color: transparent;
 }
 
 .buttons {

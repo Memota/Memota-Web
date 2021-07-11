@@ -7,7 +7,12 @@
         v-masonry-tile
         class="item col-xs-12 col-sm-6 col-md-4 col-lg-3 note-card"
       >
-        <q-card v-ripple class="cursor-pointer" @click="$router.push('/edit/' + note.id)">
+        <q-card
+          v-ripple
+          class="cursor-pointer"
+          :style="'background-color:' + note.color"
+          @click="$router.push('/edit/' + note.id)"
+        >
           <q-card-section>
             <div class="text-h6 note-title">{{ note.title }}</div>
           </q-card-section>
@@ -53,7 +58,7 @@ export default defineComponent({
       try {
         const response = await api.post(
           "/notes/",
-          { text: "", title: "" },
+          { text: "", title: "", color: "#ffffff" },
           {
             headers: { Authorization: "Bearer " + jwt },
           },
