@@ -3,18 +3,22 @@
     <q-card :style="'background-color:' + color">
       <q-card-section class="top">
         <div>
-          <q-btn round flat icon="arrow_back" @click="goBack"></q-btn>
+          <q-btn round flat icon="arrow_back" :color="darkFont ? 'black' : 'white'" @click="goBack"></q-btn>
         </div>
-        <div class="nav-text text-h6">Edit Note</div>
+        <div class="nav-text text-h6" :class="darkFont ? 'text-black' : 'text-white'">Edit Note</div>
         <div class="buttons">
-          <q-btn flat round icon="o_palette">
-            <color-picker></color-picker>
+          <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
+            <color-picker @onColorChange="updateColor"></color-picker>
           </q-btn>
           <q-btn flat round icon="o_delete" color="negative" @click="deleteNote" />
         </div>
       </q-card-section>
-      <q-card-section class="title"> <input v-model="title" maxlength="50" placeholder="Title" /> </q-card-section>
-      <q-card-section class="text"><textarea v-model="text" maxlength="10000" /></q-card-section>
+      <q-card-section class="title">
+        <input v-model="title" maxlength="50" :class="darkFont ? 'text-black' : 'text-white'" placeholder="Title" />
+      </q-card-section>
+      <q-card-section class="text">
+        <textarea v-model="text" :class="darkFont ? 'text-black' : 'text-white'" maxlength="10000" />
+      </q-card-section>
     </q-card>
   </q-dialog>
 </template>
@@ -29,6 +33,8 @@ import { Note } from "src/store/note/state"
 import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
 
+const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
+
 export default defineComponent({
   name: "EditNoteDialog",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -42,6 +48,7 @@ export default defineComponent({
     const title = ref<string>()
     const text = ref<string>()
     const color = ref<string>()
+    const darkFont = ref<boolean>(false)
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -60,6 +67,7 @@ export default defineComponent({
       title.value = note?.title
       text.value = note?.text
       color.value = note?.color
+      if (color.value) updateColor(color.value)
     })
 
     const deleteNote = async () => {
@@ -110,6 +118,12 @@ export default defineComponent({
       void router.push("/")
     }
 
+    const updateColor = (newColor: string) => {
+      color.value = newColor
+      const useDarkFont = !darkColorMatcher.test(newColor)
+      darkFont.value = useDarkFont
+    }
+
     return {
       test: ref(true),
       title,
@@ -118,6 +132,8 @@ export default defineComponent({
       deleteNote,
       patchNote,
       goBack,
+      updateColor,
+      darkFont,
     }
   },
 })
