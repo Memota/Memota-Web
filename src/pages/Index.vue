@@ -7,12 +7,21 @@
         v-masonry-tile
         class="item col-xs-12 col-sm-6 col-md-4 col-lg-3 note-card"
       >
-        <q-card v-ripple class="cursor-pointer" @click="$router.push('/edit/' + note.id)">
+        <q-card
+          v-ripple
+          class="cursor-pointer"
+          :style="'background-color:' + note.color"
+          @click="$router.push('/edit/' + note.id)"
+        >
           <q-card-section>
-            <div class="text-h6 note-title">{{ note.title }}</div>
+            <div :class="computeFontColor(note.color)" class="text-h6 note-title">
+              {{ note.title }}
+            </div>
           </q-card-section>
 
-          <q-card-section class="q-pt-none"> {{ note.text }} </q-card-section>
+          <q-card-section :class="computeFontColor(note.color)" class="q-pt-none">
+            {{ note.text }}
+          </q-card-section>
         </q-card>
       </div>
     </div>
@@ -32,6 +41,8 @@ import { useQuasar } from "quasar"
 import { api } from "src/boot/axios"
 import { useStore } from "../store"
 import { Note } from "../store/note/state"
+
+const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
 export default defineComponent({
   name: "PageIndex",
@@ -53,7 +64,7 @@ export default defineComponent({
       try {
         const response = await api.post(
           "/notes/",
-          { text: "", title: "" },
+          { text: "", title: "", color: "#ffffff" },
           {
             headers: { Authorization: "Bearer " + jwt },
           },
@@ -82,7 +93,11 @@ export default defineComponent({
       window.removeEventListener("updated-notes", refreshGrid)
     })
 
-    return { notes, createNote, impostor }
+    const computeFontColor = (color: string) => {
+      return darkColorMatcher.test(color) ? "text-white" : "text-dark"
+    }
+
+    return { notes, createNote, impostor, computeFontColor }
   },
 })
 </script>

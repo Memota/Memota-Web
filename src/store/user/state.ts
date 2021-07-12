@@ -8,6 +8,7 @@ export interface User {
   email: string
   verified: boolean
   role: string
+  noteColors: string[]
 }
 
 function state(): UserStateInterface {
@@ -18,6 +19,7 @@ function state(): UserStateInterface {
       email: "",
       verified: false,
       role: "",
+      noteColors: ["#ffffff"],
     },
   }
 }
