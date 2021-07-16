@@ -1,5 +1,5 @@
 <template>
-  <q-dialog persistent v-model="test" :maximized="$q.screen.xs || $q.screen.sm">
+  <q-dialog v-model="test" persistent :maximized="$q.screen.xs || $q.screen.sm">
     <q-card :style="'background-color:' + sharedNote.note.color">
       <q-card-section class="title">
         <div :class="darkFont ? 'text-black' : 'text-white'">{{ sharedNote.note.title }}</div>

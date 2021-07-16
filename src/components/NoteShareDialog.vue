@@ -7,7 +7,7 @@
           <q-btn flat round icon="o_copy" @click="copy" />
         </template>
       </q-input>
-      <q-toggle class="q-py-sm" v-if="sharing" v-model="expiring" label="Expiring" />
+      <q-toggle v-if="sharing" v-model="expiring" class="q-py-sm" label="Expiring" />
       <q-input v-if="sharing && expiring" v-model="date" filled mask="date" :rules="['date']" @blur="share">
         <template #append>
           <q-icon name="event" class="cursor-pointer">
