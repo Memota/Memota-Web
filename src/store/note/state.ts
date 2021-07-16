@@ -15,6 +15,7 @@ export interface Note {
 export interface SharedNote {
   id: string
   note: Note
+  expiresAt: Date
   createdAt: Date
 }
 

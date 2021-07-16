@@ -7,7 +7,7 @@
           <q-btn flat round icon="o_copy" @click="copy" />
         </template>
       </q-input>
-      <q-toggle v-if="sharing" v-model="expiring" label="Expiring" />
+      <q-toggle class="q-py-sm" v-if="sharing" v-model="expiring" label="Expiring" />
       <q-input v-if="sharing && expiring" v-model="date" filled mask="date" :rules="['date']" @blur="share">
         <template #append>
           <q-icon name="event" class="cursor-pointer">
@@ -43,25 +43,58 @@ export default defineComponent({
   async setup(props) {
     const $q = useQuasar()
 
-    const sharing = ref<boolean>(false)
+    const sharing = ref<boolean>()
     const sharedNote = ref<SharedNote>()
 
     const expiring = ref<boolean>(false)
     const date = ref<string>()
+    const oldDate = ref<string>()
 
     const jwt: string = localStorage.getItem("jwt") || ""
 
+    let setup = true
+
     watch(expiring, async (value) => {
-      if (!value) await share()
+      if (value) {
+        oldDate.value = undefined
+      }
+      await share()
     })
 
     watch(sharing, async (value) => {
+      // fix call on opening
+      if (setup) {
+        setup = false
+        return
+      }
+
+      if (value) {
+        await share()
+      } else {
+        await unshare()
+      }
+    })
+
+    const share = async () => {
       try {
-        if (value) {
-          await share()
+        let data
+        if (expiring.value && date.value) {
+          let expiryDate: Date = new Date(date.value)
+          expiryDate.setDate(expiryDate.getDate() + 1)
+          data = { expiresAt: expiryDate }
+
+          if (oldDate.value == date.value) {
+            return
+          }
         } else {
-          await unshare()
+          data = {}
         }
+
+        const response = await api.post("/notes/" + props.noteId + "/shared", data, {
+          headers: { Authorization: "Bearer " + jwt },
+        })
+        sharedNote.value = response.data as SharedNote
+        oldDate.value = date.value
       } catch (err) {
         sharing.value = false
         $q.notify({
@@ -71,30 +104,24 @@ export default defineComponent({
           icon: "report_problem",
         })
       }
-    })
-
-    const share = async () => {
-      let data
-      if (expiring.value && date.value) {
-        let expiryDate: Date = new Date(date.value)
-        expiryDate.setDate(expiryDate.getDate() + 1)
-        console.log(expiryDate)
-        data = { expiresAt: expiryDate }
-      } else {
-        data = {}
-      }
-
-      const response = await api.post("/notes/" + props.noteId + "/shared", data, {
-        headers: { Authorization: "Bearer " + jwt },
-      })
-      sharedNote.value = response.data as SharedNote
     }
 
     const unshare = async () => {
-      const response = await api.delete("/notes/" + props.noteId + "/shared", {
-        headers: { Authorization: "Bearer " + jwt },
-      })
-      sharedNote.value = response.data as SharedNote
+      try {
+        const response = await api.delete("/notes/" + props.noteId + "/shared", {
+          headers: { Authorization: "Bearer " + jwt },
+        })
+        sharedNote.value = response.data as SharedNote
+        oldDate.value = undefined
+      } catch (err) {
+        sharing.value = false
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Something went wrong",
+          icon: "report_problem",
+        })
+      }
     }
 
     try {
@@ -103,6 +130,11 @@ export default defineComponent({
       })
       sharedNote.value = (response.data as Note).sharedNote
       sharing.value = sharedNote.value != undefined
+      if (sharedNote.value?.expiresAt != undefined) {
+        expiring.value = true
+        date.value = new Date(sharedNote.value?.expiresAt).toISOString().split("T")[0].replace(/-/g, "/")
+        oldDate.value = date.value
+      }
     } catch (err) {
       $q.notify({
         color: "negative",
