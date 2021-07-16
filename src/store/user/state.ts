@@ -9,6 +9,11 @@ export interface User {
   verified: boolean
   role: string
   noteColors: string[]
+  settings: Settings
+}
+
+export interface Settings {
+  darkMode: boolean
 }
 
 function state(): UserStateInterface {
@@ -20,6 +25,7 @@ function state(): UserStateInterface {
       verified: false,
       role: "",
       noteColors: ["#ffffff"],
+      settings: { darkMode: false },
     },
   }
 }

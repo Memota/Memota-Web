@@ -1,6 +1,6 @@
 import { ActionTree } from "vuex"
 import { StateInterface } from "../index"
-import { UserStateInterface } from "./state"
+import { Settings, UserStateInterface } from "./state"
 import { api } from "boot/axios"
 import { Notify } from "quasar"
 import { AxiosError } from "axios"
@@ -44,10 +44,8 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
   },
   getProfile({ commit }) {
     const jwt: string = localStorage.getItem("jwt") || ""
-    void api.get("/users/profile", { headers: { Authorization: "Bearer " + jwt } }).then((response) => {
+    return api.get("/users/profile", { headers: { Authorization: "Bearer " + jwt } }).then((response) => {
       commit("setProfile", response.data)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      console.log(response.data.noteColors)
     })
   },
   patchNoteColors({ commit }, colors: string[]) {
@@ -57,6 +55,21 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
       .then((response) => {
         const colorResponse = response.data as ColorResponse
         commit("setColors", colorResponse.noteColors)
+      })
+  },
+  toggleDarkMode({ commit }, dark: boolean) {
+    const jwt: string = localStorage.getItem("jwt") || ""
+    void api
+      .patch(
+        "users/settings",
+        { darkMode: dark },
+        {
+          headers: { Authorization: "Bearer " + jwt },
+        },
+      )
+      .then((response) => {
+        const settingsResponse = response.data as Settings
+        commit("setDarkMode", settingsResponse.darkMode)
       })
   },
 }
