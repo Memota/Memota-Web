@@ -2,7 +2,7 @@
   <q-card class="card">
     <q-card-section>
       <q-toggle v-model="sharing" label="Sharing" />
-      <q-input class="q-mt-sm" v-if="sharing" v-model="sharedUrl" outlined readonly>
+      <q-input v-if="sharing" v-model="sharedUrl" class="q-mt-sm" outlined readonly>
         <template #append>
           <q-btn flat round icon="o_copy" @click="copy" />
         </template>
@@ -14,10 +14,8 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from "vue"
 import { useQuasar, copyToClipboard } from "quasar"
-import { useRouter, useRoute } from "vue-router"
 
 import { api } from "src/boot/axios"
-import { useStore } from "../store"
 import { SharedNote, Note } from "src/store/note/state"
 
 export default defineComponent({
@@ -29,9 +27,6 @@ export default defineComponent({
     },
   },
   async setup(props) {
-    const store = useStore()
-    const route = useRoute()
-    const router = useRouter()
     const $q = useQuasar()
 
     const sharing = ref<boolean>(false)
@@ -40,8 +35,8 @@ export default defineComponent({
     const jwt: string = localStorage.getItem("jwt") || ""
 
     watch(sharing, async (value) => {
-      if (value) {
-        try {
+      try {
+        if (value) {
           const response = await api.post(
             "/notes/" + props.noteId + "/shared",
             {},
@@ -50,30 +45,20 @@ export default defineComponent({
             },
           )
           sharedNote.value = response.data as SharedNote
-        } catch (err) {
-          sharing.value = false
-          $q.notify({
-            color: "negative",
-            position: "top",
-            message: "Something went wrong",
-            icon: "report_problem",
-          })
-        }
-      } else {
-        try {
+        } else {
           const response = await api.delete("/notes/" + props.noteId + "/shared", {
             headers: { Authorization: "Bearer " + jwt },
           })
           sharedNote.value = response.data as SharedNote
-        } catch (err) {
-          sharing.value = false
-          $q.notify({
-            color: "negative",
-            position: "top",
-            message: "Something went wrong",
-            icon: "report_problem",
-          })
         }
+      } catch (err) {
+        sharing.value = false
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Something went wrong",
+          icon: "report_problem",
+        })
       }
     })
 
