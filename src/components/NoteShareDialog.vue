@@ -7,6 +7,20 @@
           <q-btn flat round icon="o_copy" @click="copy" />
         </template>
       </q-input>
+      <q-toggle v-if="sharing" v-model="expiring" label="Expiring" />
+      <q-input v-if="sharing && expiring" v-model="date" filled mask="date" :rules="['date']" @blur="share">
+        <template #append>
+          <q-icon name="event" class="cursor-pointer">
+            <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+              <q-date v-model="date" @update:model-value="share">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Close" color="primary" flat />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-icon>
+        </template>
+      </q-input>
     </q-card-section>
   </q-card>
 </template>
@@ -32,24 +46,21 @@ export default defineComponent({
     const sharing = ref<boolean>(false)
     const sharedNote = ref<SharedNote>()
 
+    const expiring = ref<boolean>(false)
+    const date = ref<string>()
+
     const jwt: string = localStorage.getItem("jwt") || ""
+
+    watch(expiring, async (value) => {
+      if (!value) await share()
+    })
 
     watch(sharing, async (value) => {
       try {
         if (value) {
-          const response = await api.post(
-            "/notes/" + props.noteId + "/shared",
-            {},
-            {
-              headers: { Authorization: "Bearer " + jwt },
-            },
-          )
-          sharedNote.value = response.data as SharedNote
+          await share()
         } else {
-          const response = await api.delete("/notes/" + props.noteId + "/shared", {
-            headers: { Authorization: "Bearer " + jwt },
-          })
-          sharedNote.value = response.data as SharedNote
+          await unshare()
         }
       } catch (err) {
         sharing.value = false
@@ -61,6 +72,30 @@ export default defineComponent({
         })
       }
     })
+
+    const share = async () => {
+      let data
+      if (expiring.value && date.value) {
+        let expiryDate: Date = new Date(date.value)
+        expiryDate.setDate(expiryDate.getDate() + 1)
+        console.log(expiryDate)
+        data = { expiresAt: expiryDate }
+      } else {
+        data = {}
+      }
+
+      const response = await api.post("/notes/" + props.noteId + "/shared", data, {
+        headers: { Authorization: "Bearer " + jwt },
+      })
+      sharedNote.value = response.data as SharedNote
+    }
+
+    const unshare = async () => {
+      const response = await api.delete("/notes/" + props.noteId + "/shared", {
+        headers: { Authorization: "Bearer " + jwt },
+      })
+      sharedNote.value = response.data as SharedNote
+    }
 
     try {
       const response = await api.get("/notes/" + props.noteId, {
@@ -86,7 +121,7 @@ export default defineComponent({
       void copyToClipboard(sharedUrl.value)
     }
 
-    return { sharing, sharedNote, sharedUrl, copy }
+    return { sharing, sharedNote, sharedUrl, copy, expiring, date, share }
   },
 })
 </script>
