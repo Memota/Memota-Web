@@ -7,6 +7,7 @@
         </div>
         <div class="nav-text text-h6" :class="darkFont ? 'text-black' : 'text-white'">Edit Note</div>
         <div class="buttons">
+          <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
             <color-picker @onColorChange="updateColor"></color-picker>
           </q-btn>
@@ -21,6 +22,11 @@
       </q-card-section>
     </q-card>
   </q-dialog>
+  <q-dialog v-model="shareDialog">
+    <Suspense>
+      <NoteShareDialog :note-id="$route.params.id"></NoteShareDialog>
+    </Suspense>
+  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -32,13 +38,14 @@ import { api } from "src/boot/axios"
 import { Note } from "src/store/note/state"
 import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
+import NoteShareDialog from "components/NoteShareDialog.vue"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
 export default defineComponent({
   name: "EditNoteDialog",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  components: { ColorPicker },
+  components: { ColorPicker, NoteShareDialog },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -49,6 +56,7 @@ export default defineComponent({
     const text = ref<string>()
     const color = ref<string>()
     const darkFont = ref<boolean>(false)
+    const shareDialog = ref<boolean>(false)
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -134,6 +142,8 @@ export default defineComponent({
       goBack,
       updateColor,
       darkFont,
+      shareDialog,
+      note,
     }
   },
 })
