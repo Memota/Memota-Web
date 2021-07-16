@@ -8,6 +8,7 @@ const emptyUser: User = {
   verified: false,
   role: "",
   noteColors: ["#ffffff"],
+  settings: { darkMode: false },
 }
 
 const mutation: MutationTree<UserStateInterface> = {
@@ -19,6 +20,9 @@ const mutation: MutationTree<UserStateInterface> = {
   },
   setColors(state: UserStateInterface, colors: string[]) {
     state.user.noteColors = colors
+  },
+  setDarkMode(state: UserStateInterface, dark: boolean) {
+    state.user.settings.darkMode = dark
   },
 }
 

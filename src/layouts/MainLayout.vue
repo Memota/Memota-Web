@@ -4,6 +4,14 @@
       <q-toolbar>
         <q-btn flat round icon="menu" />
         <q-toolbar-title>Memota</q-toolbar-title>
+        <q-btn
+          class="q-mr-sm"
+          flat
+          round
+          dense
+          :icon="$q.dark.isActive ? 'o_light_mode' : 'o_dark_mode'"
+          @click="toggleDarkMode"
+        ></q-btn>
         <q-btn v-if="username !== ''" round flat>
           <q-avatar color="purple" text-color="white">{{ username.charAt(0) }}</q-avatar>
           <q-popup-proxy>
@@ -33,6 +41,7 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue"
 import { useRouter } from "vue-router"
+import { useQuasar } from "quasar"
 
 import { useStore } from "../store"
 
@@ -41,9 +50,16 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const store = useStore()
+    const $q = useQuasar()
     const currentPath = router.currentRoute.value.path
-    if (localStorage.getItem("jwt")) {
-      void store.dispatch("user/getProfile")
+
+    let settings = undefined
+    const jwt: string = localStorage.getItem("jwt") || ""
+    if (jwt) {
+      void store.dispatch("user/getProfile").then(() => {
+        settings = store.state.user.user.settings
+        $q.dark.set(settings.darkMode)
+      })
     } else if (
       currentPath !== "/login" &&
       currentPath !== "/register" &&
@@ -52,6 +68,7 @@ export default defineComponent({
     ) {
       void router.push("login")
     }
+
     const username = computed((): string => {
       return store.state.user.user.username
     })
@@ -60,11 +77,16 @@ export default defineComponent({
       return store.state.user.user.email
     })
 
+    const toggleDarkMode = async () => {
+      $q.dark.toggle()
+      await store.dispatch("user/toggleDarkMode", $q.dark.isActive)
+    }
+
     const logout = () => {
       void store.dispatch("user/logout")
       void router.push("login")
     }
-    return { username, email, logout }
+    return { username, email, logout, toggleDarkMode }
   },
 })
 </script>
