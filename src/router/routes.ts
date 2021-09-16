@@ -1,7 +1,9 @@
 import { RouteRecordRaw } from "vue-router"
 
 const MainLayout = () => import("layouts/MainLayout.vue")
+const SharedLayout = () => import("layouts/SharedLayout.vue")
 const Index = () => import("pages/Index.vue")
+const Shared = () => import("pages/Shared.vue")
 const RegisterDialog = () => import("components/RegisterDialog.vue")
 const LoginDialog = () => import("components/LoginDialog.vue")
 const VerifyDialog = () => import("components/VerifyDialog.vue")
@@ -11,6 +13,16 @@ const SendResetPasswordDialog = () => import("components/SendResetPasswordDialog
 const EditNoteDialog = () => import("components/EditNoteDialog.vue")
 
 const routes: RouteRecordRaw[] = [
+  {
+    path: "/shared",
+    component: SharedLayout,
+    children: [
+      {
+        path: ":id",
+        component: Shared,
+      },
+    ],
+  },
   {
     path: "/",
     component: MainLayout,

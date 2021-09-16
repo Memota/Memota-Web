@@ -9,6 +9,14 @@ export interface Note {
   color: string
   createdat: Date
   updatedat: Date
+  sharedNote: SharedNote
+}
+
+export interface SharedNote {
+  id: string
+  note: Note
+  expiresAt: Date
+  createdAt: Date
 }
 
 function state(): NoteStateInterface {
