@@ -12,6 +12,7 @@
           :icon="$q.dark.isActive ? 'o_light_mode' : 'o_dark_mode'"
           @click="toggleDarkMode"
         ></q-btn>
+        <q-btn flat round dense icon="o_cloud_download" @click="downloadBackup"></q-btn>
         <q-btn v-if="username !== ''" round flat>
           <q-avatar color="purple" text-color="white">{{ username.charAt(0) }}</q-avatar>
           <q-popup-proxy>
@@ -126,11 +127,16 @@ export default defineComponent({
       await store.dispatch("user/toggleDarkMode", $q.dark.isActive)
     }
 
+    //TODO relocate Download Backup to hamburger menu
+    const downloadBackup = () => {
+      //TODO file download Zip from backend
+    }
+
     const logout = () => {
       void store.dispatch("user/logout")
       void router.push("login")
     }
-    return { username, email, logout, toggleDarkMode, drawerOpen }
+    return { username, email, logout, toggleDarkMode, drawerOpen, downloadBackup }
   },
 })
 </script>

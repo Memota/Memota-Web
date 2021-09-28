@@ -9,6 +9,7 @@
         <div class="buttons">
           <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
           <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
+          <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
             <color-picker @onColorChange="updateColor"></color-picker>
           </q-btn>
@@ -159,6 +160,27 @@ export default defineComponent({
       darkFont.value = useDarkFont
     }
 
+    const downloadNote = async () => {
+      const jwt: string = localStorage.getItem("jwt") || ""
+      try {
+        await api
+          .get("/notes/" + (route.params.id as string) + "/download", {
+            headers: { Authorization: "Bearer " + jwt },
+            responseType: "blob",
+          })
+          .then((response) => {
+            //TODO download file
+          })
+      } catch (err) {
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "Something went wrong",
+          icon: "report_problem",
+        })
+      }
+    }
+
     return {
       test: ref(true),
       title,
@@ -168,6 +190,7 @@ export default defineComponent({
       patchNote,
       goBack,
       updateColor,
+      downloadNote,
       darkFont,
       shareDialog,
       note,
