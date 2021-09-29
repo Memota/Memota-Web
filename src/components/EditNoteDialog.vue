@@ -7,6 +7,7 @@
         </div>
         <div class="nav-text text-h6" :class="darkFont ? 'text-black' : 'text-white'">Edit Note</div>
         <div class="buttons">
+          <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
           <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
             <color-picker @onColorChange="updateColor"></color-picker>
@@ -27,6 +28,11 @@
       <NoteShareDialog :note-id="$route.params.id"></NoteShareDialog>
     </Suspense>
   </q-dialog>
+  <q-dialog v-model="imageDialog">
+    <Suspense>
+      <ImageSelectDialog :note-id="$route.params.id" @select="selectImage"></ImageSelectDialog>
+    </Suspense>
+  </q-dialog>
 </template>
 
 <script lang="ts">
@@ -39,13 +45,14 @@ import { Note } from "src/store/note/state"
 import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
+import ImageSelectDialog from "components/ImageSelectDialog.vue"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
 export default defineComponent({
   name: "EditNoteDialog",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  components: { ColorPicker, NoteShareDialog },
+  components: { ColorPicker, NoteShareDialog, ImageSelectDialog },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -57,6 +64,7 @@ export default defineComponent({
     const color = ref<string>()
     const darkFont = ref<boolean>(false)
     const shareDialog = ref<boolean>(false)
+    const imageDialog = ref(false)
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -94,6 +102,19 @@ export default defineComponent({
           icon: "report_problem",
         })
       }
+    }
+
+    const selectImage = async (id: string) => {
+      const jwt: string = localStorage.getItem("jwt") || ""
+      const response = await api.put(
+        "/notes/" + (route.params.id as string) + "/image",
+        { image: id },
+        {
+          headers: { Authorization: "Bearer " + jwt },
+        },
+      )
+      imageDialog.value = false
+      await store.dispatch("note/getNotes")
     }
 
     const patchNote = async () => {
@@ -144,6 +165,8 @@ export default defineComponent({
       darkFont,
       shareDialog,
       note,
+      imageDialog,
+      selectImage,
     }
   },
 })
