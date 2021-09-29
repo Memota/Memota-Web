@@ -2,7 +2,7 @@
   <q-layout view="hHh LpR fFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat round icon="menu" />
+        <q-btn flat round icon="menu" @click="drawerOpen = !drawerOpen" />
         <q-toolbar-title>Memota</q-toolbar-title>
         <q-btn
           class="q-mr-sm"
@@ -31,6 +31,24 @@
         </q-btn>
       </q-toolbar>
     </q-header>
+    <q-drawer v-model="drawerOpen" overlay side="left" bordered>
+      <q-scroll-area class="fit">
+        <q-list>
+          <q-item clickable v-ripple @click="$router.push('/')">
+            <q-item-section avatar>
+              <q-icon name="description" />
+            </q-item-section>
+            <q-item-section>Notes</q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="$router.push('/images')">
+            <q-item-section avatar>
+              <q-icon name="perm_media" />
+            </q-item-section>
+            <q-item-section>Images</q-item-section>
+          </q-item>
+        </q-list>
+      </q-scroll-area>
+    </q-drawer>
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -39,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue"
+import { computed, defineComponent, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useQuasar } from "quasar"
 
@@ -52,6 +70,8 @@ export default defineComponent({
     const store = useStore()
     const $q = useQuasar()
     const currentPath = router.currentRoute.value.path
+
+    const drawerOpen = ref(false)
 
     let settings = undefined
     const jwt: string = localStorage.getItem("jwt") || ""
@@ -86,7 +106,7 @@ export default defineComponent({
       void store.dispatch("user/logout")
       void router.push("login")
     }
-    return { username, email, logout, toggleDarkMode }
+    return { username, email, logout, toggleDarkMode, drawerOpen }
   },
 })
 </script>
