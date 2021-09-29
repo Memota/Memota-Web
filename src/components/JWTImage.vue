@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue"
+import { watch, defineComponent, onMounted, ref } from "vue"
 import { api } from "../boot/axios"
 
 export default defineComponent({
@@ -14,13 +14,21 @@ export default defineComponent({
   setup(props) {
     const imageUrl = ref()
 
-    onMounted(async () => {
+    const downloadImage = async () => {
       const jwt: string = localStorage.getItem("jwt") || ""
       const response = await api.get("/images/" + (props.id as string), {
         responseType: "blob",
         headers: { Authorization: "Bearer " + jwt },
       })
       imageUrl.value = URL.createObjectURL(response.data)
+    }
+
+    watch(props, () => {
+      void downloadImage()
+    })
+
+    onMounted(() => {
+      void downloadImage()
     })
     return { imageUrl }
   },

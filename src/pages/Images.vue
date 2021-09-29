@@ -9,7 +9,7 @@
       >
         <q-card v-ripple class="cursor-pointer">
           <q-card-actions vertical align="right">
-            <q-btn flat icon="o_delete"></q-btn>
+            <q-btn flat icon="o_delete" @click="() => deleteImage(index)"></q-btn>
           </q-card-actions>
           <JWTImage :id="imageID"></JWTImage>
         </q-card>
@@ -52,6 +52,18 @@ export default defineComponent({
       uploading.value = false
     }
 
+    const deleteImage = async (index: number) => {
+      if (!imageIDs.value) return
+      const id = imageIDs.value[index]
+      const jwt: string = localStorage.getItem("jwt") || ""
+      const response = await api.delete("/images/" + id, {
+        headers: { "Content-Type": "multipart/form-data", Authorization: "Bearer " + jwt },
+      })
+      if (response.status == 200) {
+        imageIDs.value?.splice(index, 1)
+      }
+    }
+
     onMounted(async () => {
       const jwt: string = localStorage.getItem("jwt") || ""
       const response = await api.get("/images", {
@@ -59,7 +71,7 @@ export default defineComponent({
       })
       imageIDs.value = response.data as string[]
     })
-    return { imageIDs, uploading, uploadFile }
+    return { imageIDs, uploading, uploadFile, deleteImage }
   },
 })
 </script>
