@@ -64,6 +64,7 @@ import { useQuasar } from "quasar"
 
 import { useStore } from "../store"
 import { api } from "boot/axios"
+import { downloadFile } from "src/utils/download"
 
 export default defineComponent({
   name: "MainLayout",
@@ -128,8 +129,11 @@ export default defineComponent({
     }
 
     //TODO relocate Download Backup to hamburger menu
-    const downloadBackup = () => {
-      //TODO file download Zip from backend
+    const downloadBackup = async () => {
+      const url = "/notes/download"
+      const fileName =
+        store.state.user.user.username.toLocaleLowerCase() + "-memota-backup-" + new Date().toLocaleDateString("fr-CA")
+      await downloadFile(url, fileName + ".zip")
     }
 
     const logout = () => {

@@ -47,6 +47,7 @@ import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
 import ImageSelectDialog from "components/ImageSelectDialog.vue"
+import { downloadFile } from "src/utils/download"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
@@ -161,24 +162,9 @@ export default defineComponent({
     }
 
     const downloadNote = async () => {
-      const jwt: string = localStorage.getItem("jwt") || ""
-      try {
-        await api
-          .get("/notes/" + (route.params.id as string) + "/download", {
-            headers: { Authorization: "Bearer " + jwt },
-            responseType: "blob",
-          })
-          .then((response) => {
-            //TODO download file
-          })
-      } catch (err) {
-        $q.notify({
-          color: "negative",
-          position: "top",
-          message: "Something went wrong",
-          icon: "report_problem",
-        })
-      }
+      const url = "/notes/" + (route.params.id as string) + "/download"
+      const fileName = (title.value || "").toLocaleLowerCase().replace(/ /g, "-")
+      await downloadFile(url, fileName + ".pdf")
     }
 
     return {
