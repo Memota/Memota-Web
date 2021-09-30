@@ -19,7 +19,7 @@ export default defineComponent({
 
     const downloadImage = async () => {
       const jwt: string = localStorage.getItem("jwt") || ""
-      const response = await api.get("/images/" + (props.id as string), {
+      const response = await api.get("/images/" + String(props.id), {
         responseType: "blob",
         headers: { Authorization: "Bearer " + jwt },
       })

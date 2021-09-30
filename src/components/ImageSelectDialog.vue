@@ -14,8 +14,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from "vue"
-import { useQuasar, copyToClipboard } from "quasar"
+import { defineComponent, ref } from "vue"
 
 import { api } from "src/boot/axios"
 import JWTImage from "components/JWTImage.vue"
@@ -24,13 +23,13 @@ export default defineComponent({
   name: "NoteShareDialog",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   components: { JWTImage },
-  emits: ["select"],
   props: {
     noteId: {
       type: String,
       default: "",
     },
   },
+  emits: ["select"],
   async setup() {
     const imageIDs = ref<string[]>()
 

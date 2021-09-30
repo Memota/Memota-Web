@@ -41,7 +41,7 @@ export default defineComponent({
     const imageIDs = ref<string[]>()
     const uploading = ref(false)
 
-    const uploadFile = async (event: any) => {
+    const uploadFile = async (event: any | unknown) => {
       if (uploading.value) return
 
       const formData = new FormData()
