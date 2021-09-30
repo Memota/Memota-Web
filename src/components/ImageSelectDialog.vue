@@ -18,8 +18,6 @@ import { computed, defineComponent, ref, watch } from "vue"
 import { useQuasar, copyToClipboard } from "quasar"
 
 import { api } from "src/boot/axios"
-import { SharedNote, Note } from "src/store/note/state"
-import Images from "pages/Images.vue"
 import JWTImage from "components/JWTImage.vue"
 
 export default defineComponent({
@@ -33,9 +31,7 @@ export default defineComponent({
       default: "",
     },
   },
-  async setup(props) {
-    const $q = useQuasar()
-
+  async setup() {
     const imageIDs = ref<string[]>()
 
     const jwt: string = localStorage.getItem("jwt") || ""

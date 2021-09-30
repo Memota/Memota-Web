@@ -9,7 +9,10 @@ import { api } from "../boot/axios"
 export default defineComponent({
   name: "EditNoteDialog",
   props: {
-    id: String,
+    id: {
+      type: String,
+      default: "0",
+    },
   },
   setup(props) {
     const imageUrl = ref()

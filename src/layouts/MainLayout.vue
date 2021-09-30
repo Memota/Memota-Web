@@ -34,13 +34,13 @@
     <q-drawer v-model="drawerOpen" overlay side="left" bordered>
       <q-scroll-area class="fit">
         <q-list>
-          <q-item clickable v-ripple @click="$router.push('/')">
+          <q-item v-ripple clickable @click="$router.push('/')">
             <q-item-section avatar>
               <q-icon name="description" />
             </q-item-section>
             <q-item-section>Notes</q-item-section>
           </q-item>
-          <q-item clickable v-ripple @click="$router.push('/images')">
+          <q-item v-ripple clickable @click="$router.push('/images')">
             <q-item-section avatar>
               <q-icon name="perm_media" />
             </q-item-section>
