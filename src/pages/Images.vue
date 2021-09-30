@@ -9,7 +9,10 @@
       >
         <q-card v-ripple class="cursor-pointer image-card">
           <q-card-actions vertical align="right">
-            <q-btn flat icon="o_delete" @click="() => deleteImage(index)"></q-btn>
+            <q-btn-group push>
+              <q-btn flat icon="o_wallpaper" @click="() => setBackground(index)"></q-btn>
+              <q-btn flat icon="o_delete" @click="() => deleteImage(index)"></q-btn>
+            </q-btn-group>
           </q-card-actions>
           <JWTImage :id="imageID"></JWTImage>
         </q-card>
@@ -18,7 +21,7 @@
     <q-page-sticky position="bottom-right" :offset="[20, 20]">
       <q-btn :loading="uploading" fab icon="upload" color="accent" @click="$refs.file.click()" />
     </q-page-sticky>
-    <input ref="file" @change="uploadFile" style="display: none" type="file" accept="image/jpeg, image/png" />
+    <input ref="file" style="display: none" type="file" accept="image/jpeg, image/png" @change="uploadFile" />
   </div>
 </template>
 
@@ -26,14 +29,16 @@
 import { defineComponent, onMounted, ref } from "vue"
 import JWTImage from "components/JWTImage.vue"
 import { api } from "../boot/axios"
+import { useStore } from "src/store"
 
 export default defineComponent({
+  name: "Images",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   components: { JWTImage },
-  name: "Images",
   setup() {
-    const imageIDs = ref<string[]>()
+    const store = useStore()
 
+    const imageIDs = ref<string[]>()
     const uploading = ref(false)
 
     const uploadFile = async (event: any) => {
@@ -50,6 +55,13 @@ export default defineComponent({
       })
       imageIDs.value?.push(response.data)
       uploading.value = false
+    }
+
+    const setBackground = async (index: number) => {
+      if (!imageIDs.value) return
+      const id = imageIDs.value[index]
+
+      await store.dispatch("user/addBackgroundImage", id)
     }
 
     const deleteImage = async (index: number) => {
@@ -71,7 +83,7 @@ export default defineComponent({
       })
       imageIDs.value = response.data as string[]
     })
-    return { imageIDs, uploading, uploadFile, deleteImage }
+    return { imageIDs, uploading, uploadFile, deleteImage, setBackground }
   },
 })
 </script>

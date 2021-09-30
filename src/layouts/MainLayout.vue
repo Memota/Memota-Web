@@ -57,11 +57,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from "vue"
+import { computed, defineComponent, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useQuasar } from "quasar"
 
 import { useStore } from "../store"
+import { api } from "boot/axios"
 
 export default defineComponent({
   name: "MainLayout",
@@ -97,6 +98,29 @@ export default defineComponent({
       return store.state.user.user.email
     })
 
+    const backgroundImage = computed((): string | undefined => {
+      if (store.state.user.user.settings.image) return store.state.user.user.settings.image.id
+      return undefined
+    })
+
+    watch(backgroundImage, (id) => {
+      void setBackground(id)
+    })
+
+    const setBackground = async (id: string | undefined) => {
+      if (!id) {
+        document.body.style.backgroundImage = ""
+      } else {
+        const jwt: string = localStorage.getItem("jwt") || ""
+        const image = await api.get("/images/" + id, {
+          responseType: "blob",
+          headers: { Authorization: "Bearer " + jwt },
+        })
+        const backgroundUrl = URL.createObjectURL(image.data)
+        document.body.style.backgroundImage = "url('" + backgroundUrl + "')"
+      }
+    }
+
     const toggleDarkMode = async () => {
       $q.dark.toggle()
       await store.dispatch("user/toggleDarkMode", $q.dark.isActive)
@@ -110,3 +134,12 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+.bg {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: -1;
+}
+</style>

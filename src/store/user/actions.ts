@@ -72,6 +72,21 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
         commit("setDarkMode", settingsResponse.darkMode)
       })
   },
+  addBackgroundImage({ commit }, id: string) {
+    const jwt: string = localStorage.getItem("jwt") || ""
+    void api
+      .patch(
+        "users/settings",
+        { image: id },
+        {
+          headers: { Authorization: "Bearer " + jwt },
+        },
+      )
+      .then((response) => {
+        const settingsResponse = response.data as Settings
+        commit("setBackgroundImage", settingsResponse.image)
+      })
+  },
 }
 
 export default actions
