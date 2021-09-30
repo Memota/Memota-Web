@@ -1,13 +1,13 @@
 <template>
   <div class="background">
-    <div v-masonry class="row notes" transition-duration="0.4s" item-selector=".item">
+    <div v-masonry class="row images" transition-duration="0.4s" item-selector=".item">
       <div
         v-for="(imageID, index) in imageIDs"
         :key="index"
         v-masonry-tile
         class="item col-xs-12 col-sm-6 col-md-4 col-lg-3"
       >
-        <q-card v-ripple class="cursor-pointer">
+        <q-card v-ripple class="cursor-pointer image-card">
           <q-card-actions vertical align="right">
             <q-btn flat icon="o_delete" @click="() => deleteImage(index)"></q-btn>
           </q-card-actions>
@@ -82,24 +82,12 @@ export default defineComponent({
   padding: 5px;
 }
 @media (min-width: $breakpoint-xl-min) {
-  .notes {
+  .images {
     margin: 0px 20%;
     padding-top: 20px;
   }
 }
-.note-card {
-  padding: 5px;
-}
-.note-card > .q-card {
-  overflow: hidden;
-  max-height: 400px;
-  white-space: pre-wrap;
-}
-.note-title {
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-.impostor-card {
-  height: 0px;
+.image-card {
+  margin: 5px;
 }
 </style>

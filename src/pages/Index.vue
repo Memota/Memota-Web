@@ -4,13 +4,11 @@
       <div v-for="note in notes" :key="note.id" v-masonry-tile class="item col-xs-12 col-sm-6 col-md-4 col-lg-3">
         <q-card
           v-ripple
-          class="cursor-pointer"
+          class="cursor-pointer note-card"
           :style="'background-color:' + note.color"
           @click="$router.push('/edit/' + note.id)"
         >
-          <q-card-section v-if="note.image">
-            <JWTImage :id="note.image.id"></JWTImage>
-          </q-card-section>
+          <JWTImage v-if="note.image" :id="note.image.id"></JWTImage>
           <q-card-section>
             <div :class="computeFontColor(note.color)" class="text-h6 note-title">
               {{ note.title }}
@@ -115,7 +113,7 @@ export default defineComponent({
   }
 }
 .note-card {
-  padding: 5px;
+  margin: 5px;
 }
 .note-card > .q-card {
   overflow: hidden;
