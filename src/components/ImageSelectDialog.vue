@@ -1,5 +1,8 @@
 <template>
   <q-card class="card">
+    <q-card-actions vertical align="right">
+      <q-btn flat icon="o_delete" @click="$emit('select', 'clear')"></q-btn>
+    </q-card-actions>
     <div class="row notes">
       <div v-for="(imageID, index) in imageIDs" :key="index" v-masonry-tile class="col-4">
         <q-card v-ripple class="cursor-pointer" @click="$emit('select', imageID)">

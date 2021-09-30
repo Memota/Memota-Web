@@ -106,13 +106,19 @@ export default defineComponent({
 
     const selectImage = async (id: string) => {
       const jwt: string = localStorage.getItem("jwt") || ""
-      const response = await api.put(
-        "/notes/" + (route.params.id as string) + "/image",
-        { image: id },
-        {
+      if (id === "clear") {
+        await api.delete("/notes/" + (route.params.id as string) + "/image", {
           headers: { Authorization: "Bearer " + jwt },
-        },
-      )
+        })
+      } else {
+        await api.put(
+          "/notes/" + (route.params.id as string) + "/image",
+          { image: id },
+          {
+            headers: { Authorization: "Bearer " + jwt },
+          },
+        )
+      }
       imageDialog.value = false
       await store.dispatch("note/getNotes")
     }
