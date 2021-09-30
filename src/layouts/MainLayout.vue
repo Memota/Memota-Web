@@ -64,7 +64,6 @@ import { useQuasar } from "quasar"
 
 import { useStore } from "../store"
 import { api } from "boot/axios"
-import { downloadFile } from "src/utils/download"
 
 export default defineComponent({
   name: "MainLayout",
@@ -128,19 +127,11 @@ export default defineComponent({
       await store.dispatch("user/toggleDarkMode", $q.dark.isActive)
     }
 
-    //TODO relocate Download Backup to hamburger menu
-    const downloadBackup = async () => {
-      const url = "/notes/download"
-      const fileName =
-        store.state.user.user.username.toLocaleLowerCase() + "-memota-backup-" + new Date().toLocaleDateString("fr-CA")
-      await downloadFile(url, fileName + ".zip")
-    }
-
     const logout = () => {
       void store.dispatch("user/logout")
       void router.push("login")
     }
-    return { username, email, logout, toggleDarkMode, drawerOpen, downloadBackup }
+    return { username, email, logout, toggleDarkMode, drawerOpen }
   },
 })
 </script>

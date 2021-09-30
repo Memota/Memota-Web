@@ -162,8 +162,9 @@ export default defineComponent({
     }
 
     const downloadNote = async () => {
+      await patchNote()
       const url = "/notes/" + (route.params.id as string) + "/download"
-      const fileName = (title.value || "").toLocaleLowerCase().replace(/ /g, "-")
+      const fileName = (title.value || "untitled").toLocaleLowerCase().replace(/ /g, "-")
       await downloadFile(url, fileName + ".pdf")
     }
 

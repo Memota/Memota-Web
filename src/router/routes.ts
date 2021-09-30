@@ -12,6 +12,7 @@ const ResetPasswordDialog = () => import("components/ResetPasswordDialog.vue")
 const SendResetPasswordDialog = () => import("components/SendResetPasswordDialog.vue")
 const EditNoteDialog = () => import("components/EditNoteDialog.vue")
 const Images = () => import("pages/Images.vue")
+const BackupDialog = () => import("components/BackupDialog.vue")
 
 const routes: RouteRecordRaw[] = [
   {
@@ -83,6 +84,13 @@ const routes: RouteRecordRaw[] = [
         components: {
           default: Index,
           dialog: EditNoteDialog,
+        },
+      },
+      {
+        path: "backup",
+        components: {
+          default: Index,
+          dialog: BackupDialog,
         },
       },
     ],
