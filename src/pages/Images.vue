@@ -21,7 +21,14 @@
     <q-page-sticky position="bottom-right" :offset="[20, 20]">
       <q-btn :loading="uploading" fab icon="upload" color="accent" @click="$refs.file.click()" />
     </q-page-sticky>
-    <input ref="file" style="display: none" type="file" accept="image/jpeg, image/png" @change="uploadFile" />
+    <input
+      ref="file"
+      v-if="!uploading"
+      style="display: none"
+      type="file"
+      accept="image/jpeg, image/png"
+      @change="uploadFile"
+    />
   </div>
 </template>
 
@@ -53,6 +60,7 @@ export default defineComponent({
       const response = await api.post("/images", formData, {
         headers: { "Content-Type": "multipart/form-data", Authorization: "Bearer " + jwt },
       })
+
       imageIDs.value?.push(response.data)
       uploading.value = false
     }
