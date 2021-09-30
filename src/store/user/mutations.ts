@@ -1,5 +1,6 @@
 import { MutationTree } from "vuex"
 import { User, UserStateInterface } from "./state"
+import { Image } from "src/store/note/state"
 
 const emptyUser: User = {
   id: "",
@@ -23,6 +24,9 @@ const mutation: MutationTree<UserStateInterface> = {
   },
   setDarkMode(state: UserStateInterface, dark: boolean) {
     state.user.settings.darkMode = dark
+  },
+  setBackgroundImage(state: UserStateInterface, image: Image) {
+    state.user.settings.image = image
   },
 }
 

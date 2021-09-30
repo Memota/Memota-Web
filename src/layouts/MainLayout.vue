@@ -2,7 +2,7 @@
   <q-layout view="hHh LpR fFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat round icon="menu" />
+        <q-btn flat round icon="menu" @click="drawerOpen = !drawerOpen" />
         <q-toolbar-title>Memota</q-toolbar-title>
         <q-btn
           class="q-mr-sm"
@@ -31,6 +31,24 @@
         </q-btn>
       </q-toolbar>
     </q-header>
+    <q-drawer v-model="drawerOpen" overlay side="left" bordered>
+      <q-scroll-area class="fit">
+        <q-list>
+          <q-item v-ripple clickable @click="$router.push('/')">
+            <q-item-section avatar>
+              <q-icon name="description" />
+            </q-item-section>
+            <q-item-section>Notes</q-item-section>
+          </q-item>
+          <q-item v-ripple clickable @click="$router.push('/images')">
+            <q-item-section avatar>
+              <q-icon name="perm_media" />
+            </q-item-section>
+            <q-item-section>Images</q-item-section>
+          </q-item>
+        </q-list>
+      </q-scroll-area>
+    </q-drawer>
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -39,11 +57,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue"
+import { computed, defineComponent, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useQuasar } from "quasar"
 
 import { useStore } from "../store"
+import { api } from "boot/axios"
 
 export default defineComponent({
   name: "MainLayout",
@@ -52,6 +71,8 @@ export default defineComponent({
     const store = useStore()
     const $q = useQuasar()
     const currentPath = router.currentRoute.value.path
+
+    const drawerOpen = ref(false)
 
     let settings = undefined
     const jwt: string = localStorage.getItem("jwt") || ""
@@ -77,6 +98,29 @@ export default defineComponent({
       return store.state.user.user.email
     })
 
+    const backgroundImage = computed((): string | undefined => {
+      if (store.state.user.user.settings.image) return store.state.user.user.settings.image.id
+      return undefined
+    })
+
+    watch(backgroundImage, (id) => {
+      void setBackground(id)
+    })
+
+    const setBackground = async (id: string | undefined) => {
+      if (!id) {
+        document.body.style.backgroundImage = ""
+      } else {
+        const jwt: string = localStorage.getItem("jwt") || ""
+        const image = await api.get("/images/" + id, {
+          responseType: "blob",
+          headers: { Authorization: "Bearer " + jwt },
+        })
+        const backgroundUrl = URL.createObjectURL(image.data)
+        document.body.style.backgroundImage = "url('" + backgroundUrl + "')"
+      }
+    }
+
     const toggleDarkMode = async () => {
       $q.dark.toggle()
       await store.dispatch("user/toggleDarkMode", $q.dark.isActive)
@@ -86,7 +130,16 @@ export default defineComponent({
       void store.dispatch("user/logout")
       void router.push("login")
     }
-    return { username, email, logout, toggleDarkMode }
+    return { username, email, logout, toggleDarkMode, drawerOpen }
   },
 })
 </script>
+
+<style>
+.bg {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: -1;
+}
+</style>

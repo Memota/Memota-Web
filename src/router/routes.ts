@@ -11,6 +11,7 @@ const VerifySpinnerDialog = () => import("components/VerifySpinnerDialog.vue")
 const ResetPasswordDialog = () => import("components/ResetPasswordDialog.vue")
 const SendResetPasswordDialog = () => import("components/SendResetPasswordDialog.vue")
 const EditNoteDialog = () => import("components/EditNoteDialog.vue")
+const Images = () => import("pages/Images.vue")
 
 const routes: RouteRecordRaw[] = [
   {
@@ -30,6 +31,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: "",
         component: Index,
+      },
+      {
+        path: "/images",
+        component: Images,
       },
       {
         path: "register",

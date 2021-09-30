@@ -7,9 +7,10 @@ export interface Note {
   title: string
   text: string
   color: string
-  createdat: Date
-  updatedat: Date
+  createdAt: Date
+  updatedAt: Date
   sharedNote: SharedNote
+  image: Image
 }
 
 export interface SharedNote {
@@ -17,6 +18,13 @@ export interface SharedNote {
   note: Note
   expiresAt: Date
   createdAt: Date
+}
+
+export interface Image {
+  id: string
+  mimetype: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 function state(): NoteStateInterface {

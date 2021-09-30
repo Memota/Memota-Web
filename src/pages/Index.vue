@@ -1,18 +1,14 @@
 <template>
   <div class="background">
     <div v-masonry class="row notes" transition-duration="0.4s" item-selector=".item">
-      <div
-        v-for="note in notes"
-        :key="note.id"
-        v-masonry-tile
-        class="item col-xs-12 col-sm-6 col-md-4 col-lg-3 note-card"
-      >
+      <div v-for="note in notes" :key="note.id" v-masonry-tile class="item col-xs-12 col-sm-6 col-md-4 col-lg-3">
         <q-card
           v-ripple
-          class="cursor-pointer"
+          class="cursor-pointer note-card"
           :style="'background-color:' + note.color"
           @click="$router.push('/edit/' + note.id)"
         >
+          <JWTImage v-if="note.image" :id="note.image.id"></JWTImage>
           <q-card-section>
             <div :class="computeFontColor(note.color)" class="text-h6 note-title">
               {{ note.title }}
@@ -41,11 +37,14 @@ import { useQuasar } from "quasar"
 import { api } from "src/boot/axios"
 import { useStore } from "../store"
 import { Note } from "../store/note/state"
+import JWTImage from "components/JWTImage.vue"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
 export default defineComponent({
   name: "PageIndex",
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  components: { JWTImage },
   setup() {
     const store = useStore()
     const router = useRouter()
@@ -114,7 +113,7 @@ export default defineComponent({
   }
 }
 .note-card {
-  padding: 5px;
+  margin: 5px;
 }
 .note-card > .q-card {
   overflow: hidden;

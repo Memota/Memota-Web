@@ -1,3 +1,5 @@
+import { Image } from "src/store/note/state"
+
 export interface UserStateInterface {
   user: User
 }
@@ -14,6 +16,7 @@ export interface User {
 
 export interface Settings {
   darkMode: boolean
+  image?: Image
 }
 
 function state(): UserStateInterface {
