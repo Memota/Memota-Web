@@ -113,6 +113,7 @@ export default defineComponent({
   }
 }
 .note-card {
+  overflow: hidden;
   margin: 5px;
 }
 .note-card > .q-card {
