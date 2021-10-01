@@ -7,6 +7,13 @@
         </div>
         <div class="nav-text text-h6" :class="darkFont ? 'text-black' : 'text-white'">Edit Note</div>
         <div class="buttons">
+          <q-btn
+            flat
+            round
+            :icon="pinned ? 'push_pin' : 'o_push_pin'"
+            :color="darkFont ? 'black' : 'white'"
+            @click="togglePinnedState"
+          />
           <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
           <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
           <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
@@ -42,7 +49,7 @@ import { useQuasar } from "quasar"
 import { useRouter, useRoute } from "vue-router"
 
 import { api } from "src/boot/axios"
-import { Note } from "src/store/note/state"
+import { Note, NoteOptions } from "src/store/note/state"
 import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
@@ -67,6 +74,7 @@ export default defineComponent({
     const darkFont = ref<boolean>(false)
     const shareDialog = ref<boolean>(false)
     const imageDialog = ref(false)
+    const pinned = ref<boolean>(false)
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -85,6 +93,7 @@ export default defineComponent({
       title.value = note?.title
       text.value = note?.text
       color.value = note?.color
+      pinned.value = note?.options.pinned || false
       if (color.value) updateColor(color.value)
     })
 
@@ -130,7 +139,7 @@ export default defineComponent({
       try {
         await api.patch(
           "/notes/" + (route.params.id as string),
-          { text: text.value, title: title.value, color: color.value },
+          { text: text.value, title: title.value, color: color.value, options: { pinned: pinned.value } },
           {
             headers: { Authorization: "Bearer " + jwt },
           },
@@ -168,6 +177,13 @@ export default defineComponent({
       await downloadFile(url, fileName + ".pdf")
     }
 
+    const togglePinnedState = () => {
+      if (note != undefined) {
+        pinned.value = !pinned.value
+        void patchNote()
+      }
+    }
+
     return {
       test: ref(true),
       title,
@@ -183,6 +199,8 @@ export default defineComponent({
       note,
       imageDialog,
       selectImage,
+      pinned,
+      togglePinnedState,
     }
   },
 })

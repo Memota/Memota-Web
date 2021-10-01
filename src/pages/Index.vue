@@ -15,7 +15,7 @@
             <div :class="computeFontColor(note.color)" class="text-h6 note-title">
               {{ note.title }}
             </div>
-            <q-icon v-if="note.options.pinned" name="o_push_pin" :class="computeFontColor(note.color)" class="pin" />
+            <q-icon name="push_pin" :class="computeFontColor(note.color)" class="pin" />
           </q-card-section>
 
           <q-card-section
@@ -55,7 +55,6 @@
             <div :class="computeFontColor(note.color)" class="text-h6 note-title">
               {{ note.title }}
             </div>
-            <q-icon v-if="note.options.pinned" name="o_push_pin" :class="computeFontColor(note.color)" class="pin" />
           </q-card-section>
 
           <q-card-section
