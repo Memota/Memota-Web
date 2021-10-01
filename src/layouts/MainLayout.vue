@@ -46,6 +46,12 @@
             </q-item-section>
             <q-item-section>Images</q-item-section>
           </q-item>
+          <q-item v-ripple clickable @click="$router.push('/backup')">
+            <q-item-section avatar>
+              <q-icon name="o_cloud_download" />
+            </q-item-section>
+            <q-item-section>Backup</q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
     </q-drawer>

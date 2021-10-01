@@ -9,6 +9,7 @@
         <div class="buttons">
           <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
           <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
+          <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
             <color-picker @onColorChange="updateColor"></color-picker>
           </q-btn>
@@ -46,6 +47,7 @@ import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
 import ImageSelectDialog from "components/ImageSelectDialog.vue"
+import { downloadFile } from "src/utils/download"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
@@ -159,6 +161,13 @@ export default defineComponent({
       darkFont.value = useDarkFont
     }
 
+    const downloadNote = async () => {
+      await patchNote()
+      const url = "/notes/" + (route.params.id as string) + "/download"
+      const fileName = (title.value || "untitled").toLocaleLowerCase().replace(/ /g, "-")
+      await downloadFile(url, fileName + ".pdf")
+    }
+
     return {
       test: ref(true),
       title,
@@ -168,6 +177,7 @@ export default defineComponent({
       patchNote,
       goBack,
       updateColor,
+      downloadNote,
       darkFont,
       shareDialog,
       note,
