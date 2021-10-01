@@ -15,9 +15,12 @@
             </div>
           </q-card-section>
 
-          <q-card-section :class="computeFontColor(note.color)" class="q-pt-none">
+          <q-card-section v-if="!note.options.hidden" :class="computeFontColor(note.color)" class="q-pt-none">
             {{ note.text }}
           </q-card-section>
+          <div v-if="note.options.hidden" class="text-center" style="margin-bottom: 25px">
+            <q-icon name="visibility_off" :class="computeFontColor(note.color)" style="font-size: 4rem" />
+          </div>
         </q-card>
       </div>
     </div>
