@@ -14,6 +14,13 @@
             :color="darkFont ? 'black' : 'white'"
             @click="togglePinnedState"
           />
+          <q-btn
+            flat
+            round
+            :icon="hidden ? 'visibility_off' : 'visibility'"
+            :color="darkFont ? 'black' : 'white'"
+            @click="toggleHiddenState"
+          />
           <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
           <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
           <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
@@ -26,7 +33,7 @@
       <q-card-section class="title">
         <input v-model="title" maxlength="50" :class="darkFont ? 'text-black' : 'text-white'" placeholder="Title" />
       </q-card-section>
-      <q-card-section class="text">
+      <q-card-section v-if="!needsDecryption" class="text">
         <textarea v-model="text" :class="darkFont ? 'text-black' : 'text-white'" maxlength="10000" />
       </q-card-section>
     </q-card>
@@ -41,6 +48,7 @@
       <ImageSelectDialog :note-id="$route.params.id" @select="selectImage"></ImageSelectDialog>
     </Suspense>
   </q-dialog>
+  <PasswordDialog v-if="needsDecryption" @password="decryptNote"> </PasswordDialog>
 </template>
 
 <script lang="ts">
@@ -55,13 +63,14 @@ import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
 import ImageSelectDialog from "components/ImageSelectDialog.vue"
 import { downloadFile } from "src/utils/download"
+import PasswordDialog from "components/PasswordDialog.vue"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
 export default defineComponent({
   name: "EditNoteDialog",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  components: { ColorPicker, NoteShareDialog, ImageSelectDialog },
+  components: { ColorPicker, NoteShareDialog, ImageSelectDialog, PasswordDialog },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -74,7 +83,10 @@ export default defineComponent({
     const darkFont = ref<boolean>(false)
     const shareDialog = ref<boolean>(false)
     const imageDialog = ref(false)
+    const passwordDialog = ref(false)
     const pinned = ref<boolean>(false)
+    const hidden = ref<boolean>(false)
+    const needsDecryption = ref<boolean>(false)
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -91,9 +103,16 @@ export default defineComponent({
         }
       }
       title.value = note?.title
+
+      // Decrypt if encrypted
+      if (note?.options.encrypted) {
+        needsDecryption.value = true
+      }
+
       text.value = note?.text
       color.value = note?.color
       pinned.value = note?.options.pinned || false
+      hidden.value = note?.options.hidden || false
       if (color.value) updateColor(color.value)
     })
 
@@ -139,7 +158,12 @@ export default defineComponent({
       try {
         await api.patch(
           "/notes/" + (route.params.id as string),
-          { text: text.value, title: title.value, color: color.value, options: { pinned: pinned.value } },
+          {
+            text: text.value,
+            title: title.value,
+            color: color.value,
+            options: { pinned: pinned.value, hidden: hidden.value },
+          },
           {
             headers: { Authorization: "Bearer " + jwt },
           },
@@ -184,6 +208,19 @@ export default defineComponent({
       }
     }
 
+    const toggleHiddenState = () => {
+      if (note != undefined) {
+        hidden.value = !hidden.value
+        void patchNote()
+      }
+    }
+
+    const decryptNote = (password: string) => {
+      console.log("decrypt using " + password)
+      needsDecryption.value = false
+      text.value = note?.text
+    }
+
     return {
       test: ref(true),
       title,
@@ -201,6 +238,11 @@ export default defineComponent({
       selectImage,
       pinned,
       togglePinnedState,
+      hidden,
+      toggleHiddenState,
+      needsDecryption,
+      passwordDialog,
+      decryptNote,
     }
   },
 })
