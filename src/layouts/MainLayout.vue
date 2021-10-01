@@ -12,7 +12,6 @@
           :icon="$q.dark.isActive ? 'o_light_mode' : 'o_dark_mode'"
           @click="toggleDarkMode"
         ></q-btn>
-        <q-btn flat round dense icon="o_cloud_download" @click="downloadBackup"></q-btn>
         <q-btn v-if="username !== ''" round flat>
           <q-avatar color="purple" text-color="white">{{ username.charAt(0) }}</q-avatar>
           <q-popup-proxy>
@@ -46,6 +45,12 @@
               <q-icon name="perm_media" />
             </q-item-section>
             <q-item-section>Images</q-item-section>
+          </q-item>
+          <q-item v-ripple clickable @click="$router.push('/backup')">
+            <q-item-section avatar>
+              <q-icon name="o_cloud_download" />
+            </q-item-section>
+            <q-item-section>Backup</q-item-section>
           </q-item>
         </q-list>
       </q-scroll-area>
