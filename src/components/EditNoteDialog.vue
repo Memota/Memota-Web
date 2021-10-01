@@ -17,11 +17,18 @@
           <q-btn
             flat
             round
-            :icon="hidden ? 'visibility_off' : 'visibility'"
+            :icon="hidden ? 'o_visibility_off' : 'o_visibility'"
             :color="darkFont ? 'black' : 'white'"
             @click="toggleHiddenState"
           />
-          <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
+          <q-btn
+            flat
+            round
+            :icon="encrypted ? 'o_lock' : 'o_lock_open'"
+            :color="darkFont ? 'black' : 'white'"
+            @click="toggleEncryption"
+          />
+          <q-btn flat round icon="o_image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
           <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
           <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
@@ -48,7 +55,8 @@
       <ImageSelectDialog :note-id="$route.params.id" @select="selectImage"></ImageSelectDialog>
     </Suspense>
   </q-dialog>
-  <PasswordDialog v-if="needsDecryption" @password="decryptNote"> </PasswordDialog>
+  <PasswordDialog v-if="needsDecryption" button-text="Decrypt" @password="decryptNote"> </PasswordDialog>
+  <PasswordDialog v-if="isAboutToEncrypt" button-text="Encrypt" @password="decryptNote"> </PasswordDialog>
 </template>
 
 <script lang="ts">
@@ -64,6 +72,7 @@ import NoteShareDialog from "components/NoteShareDialog.vue"
 import ImageSelectDialog from "components/ImageSelectDialog.vue"
 import { downloadFile } from "src/utils/download"
 import PasswordDialog from "components/PasswordDialog.vue"
+import CryptoJS from "crypto-js"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
@@ -86,7 +95,9 @@ export default defineComponent({
     const passwordDialog = ref(false)
     const pinned = ref<boolean>(false)
     const hidden = ref<boolean>(false)
+    const encrypted = ref<boolean>(false)
     const needsDecryption = ref<boolean>(false)
+    const isAboutToEncrypt = ref<boolean>(false)
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -104,7 +115,6 @@ export default defineComponent({
       }
       title.value = note?.title
 
-      // Decrypt if encrypted
       if (note?.options.encrypted) {
         needsDecryption.value = true
       }
@@ -156,13 +166,19 @@ export default defineComponent({
     const patchNote = async () => {
       const jwt: string = localStorage.getItem("jwt") || ""
       try {
+        let content = text.value
+
+        if (encrypted.value) {
+          content = CryptoJS.AES.encrypt(text.value || "", password).toString()
+        }
+
         await api.patch(
           "/notes/" + (route.params.id as string),
           {
-            text: text.value,
+            text: content,
             title: title.value,
             color: color.value,
-            options: { pinned: pinned.value, hidden: hidden.value },
+            options: { pinned: pinned.value, hidden: hidden.value, encrypted: encrypted.value },
           },
           {
             headers: { Authorization: "Bearer " + jwt },
@@ -216,9 +232,34 @@ export default defineComponent({
     }
 
     const decryptNote = (password: string) => {
-      console.log("decrypt using " + password)
-      needsDecryption.value = false
-      text.value = note?.text
+      if (isAboutToEncrypt.value) {
+        // encrypt remotely
+        encrypted.value = true
+        isAboutToEncrypt.value = false
+
+        text.value = CryptoJS.AES.encrypt(text.value || "", password).toString()
+
+        void patchNote()
+      } else {
+        // decrypt locally
+        console.log("decrypt " + text.value + " using " + password)
+
+        var bytes = CryptoJS.AES.decrypt(text.value || "", password)
+        var originalText = bytes.toString(CryptoJS.enc.Utf8)
+
+        needsDecryption.value = false
+        text.value = originalText
+        console.log("decrypted: " + text.value)
+      }
+    }
+
+    const toggleEncryption = () => {
+      if (!encrypted.value) {
+        isAboutToEncrypt.value = true
+      } else {
+        // decrypt remotely
+        void patchNote()
+      }
     }
 
     return {
@@ -243,6 +284,9 @@ export default defineComponent({
       needsDecryption,
       passwordDialog,
       decryptNote,
+      encrypted,
+      toggleEncryption,
+      isAboutToEncrypt,
     }
   },
 })

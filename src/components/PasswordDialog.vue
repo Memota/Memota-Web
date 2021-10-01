@@ -23,7 +23,7 @@
             />
           </template>
         </q-input>
-        <q-btn class="submit-button" label="Decrypt" type="submit" color="primary" />
+        <q-btn class="submit-button" :label="buttonText" type="submit" color="primary" />
       </q-form>
     </q-card>
   </q-dialog>
@@ -34,8 +34,13 @@ import { defineComponent, ref } from "vue"
 
 export default defineComponent({
   name: "PasswordDialog",
+  props: {
+    buttonText: {
+      default: "Done",
+      type: String,
+    },
+  },
   emits: ["password"],
-
   setup(props, { emit }) {
     const password = ref("")
 
