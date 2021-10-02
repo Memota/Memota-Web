@@ -40,7 +40,7 @@
       <q-card-section class="title">
         <input v-model="title" maxlength="50" :class="darkFont ? 'text-black' : 'text-white'" placeholder="Title" />
       </q-card-section>
-      <q-card-section v-if="!needsDecryption" class="text">
+      <q-card-section class="text">
         <textarea v-model="text" :class="darkFont ? 'text-black' : 'text-white'" maxlength="10000" />
       </q-card-section>
     </q-card>
@@ -55,8 +55,7 @@
       <ImageSelectDialog :note-id="$route.params.id" @select="selectImage"></ImageSelectDialog>
     </Suspense>
   </q-dialog>
-  <PasswordDialog v-if="needsDecryption" button-text="Decrypt" @password="decryptNote"> </PasswordDialog>
-  <PasswordDialog v-if="isAboutToEncrypt" button-text="Encrypt" @password="decryptNote"> </PasswordDialog>
+  <PasswordDialog v-if="askPassword" button-text="Submit" @password="enteredPassword"> </PasswordDialog>
 </template>
 
 <script lang="ts">
@@ -73,6 +72,7 @@ import ImageSelectDialog from "components/ImageSelectDialog.vue"
 import { downloadFile } from "src/utils/download"
 import PasswordDialog from "components/PasswordDialog.vue"
 import CryptoJS from "crypto-js"
+import { NoteSecurity } from "../utils/security"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
@@ -96,8 +96,8 @@ export default defineComponent({
     const pinned = ref<boolean>(false)
     const hidden = ref<boolean>(false)
     const encrypted = ref<boolean>(false)
-    const needsDecryption = ref<boolean>(false)
-    const isAboutToEncrypt = ref<boolean>(false)
+    const askPassword = ref<boolean>(false)
+    const password = ref<string>()
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -113,16 +113,13 @@ export default defineComponent({
           void router.push("/404")
         }
       }
+      if (!note?.options.encrypted) text.value = note?.text
       title.value = note?.title
-
-      if (note?.options.encrypted) {
-        needsDecryption.value = true
-      }
-
-      text.value = note?.text
       color.value = note?.color
       pinned.value = note?.options.pinned || false
       hidden.value = note?.options.hidden || false
+      encrypted.value = note?.options.encrypted || false
+      askPassword.value = note?.options.encrypted || false
       if (color.value) updateColor(color.value)
     })
 
@@ -164,12 +161,21 @@ export default defineComponent({
     }
 
     const patchNote = async () => {
+      // Note not loaded yet
+      if (note == undefined) {
+        return
+      }
       const jwt: string = localStorage.getItem("jwt") || ""
       try {
         let content = text.value
 
         if (encrypted.value) {
-          content = CryptoJS.AES.encrypt(text.value || "", password).toString()
+          // Should never happen - just in case
+          if (password.value == undefined) {
+            throw new Error("no password set")
+          }
+          // Encrypt content
+          content = NoteSecurity.encryptText(text.value || "", password.value)
         }
 
         await api.patch(
@@ -231,33 +237,44 @@ export default defineComponent({
       }
     }
 
-    const decryptNote = (password: string) => {
-      if (isAboutToEncrypt.value) {
-        // encrypt remotely
-        encrypted.value = true
-        isAboutToEncrypt.value = false
+    const enteredPassword = (newPass: string) => {
+      console.log("got a password: " + newPass)
+      askPassword.value = false
 
-        text.value = CryptoJS.AES.encrypt(text.value || "", password).toString()
+      if (note != undefined) {
+        if (encrypted.value) {
+          // try to decrypt note content using the given password
+          try {
+            text.value = NoteSecurity.decryptContent(note, newPass)
+            password.value = newPass
+          } catch (err) {
+            void router.push("/")
 
-        void patchNote()
-      } else {
-        // decrypt locally
-        console.log("decrypt " + text.value + " using " + password)
-
-        var bytes = CryptoJS.AES.decrypt(text.value || "", password)
-        var originalText = bytes.toString(CryptoJS.enc.Utf8)
-
-        needsDecryption.value = false
-        text.value = originalText
-        console.log("decrypted: " + text.value)
+            // password wrong?
+            $q.notify({
+              color: "negative",
+              position: "top",
+              message: "Wrong password",
+              icon: "report_problem",
+            })
+          }
+        } else {
+          console.log("set encryption to true...")
+          // set encryption to true
+          encrypted.value = true
+          password.value = newPass
+          void patchNote()
+        }
       }
     }
 
     const toggleEncryption = () => {
       if (!encrypted.value) {
-        isAboutToEncrypt.value = true
+        // invoke password prompt
+        askPassword.value = true
       } else {
         // decrypt remotely
+        encrypted.value = false
         void patchNote()
       }
     }
@@ -281,12 +298,11 @@ export default defineComponent({
       togglePinnedState,
       hidden,
       toggleHiddenState,
-      needsDecryption,
       passwordDialog,
-      decryptNote,
       encrypted,
       toggleEncryption,
-      isAboutToEncrypt,
+      askPassword,
+      enteredPassword,
     }
   },
 })
