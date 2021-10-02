@@ -15,6 +15,7 @@
             @click="togglePinnedState"
           />
           <q-btn
+            v-if="!encrypted"
             flat
             round
             :icon="hidden ? 'o_visibility_off' : 'o_visibility'"
