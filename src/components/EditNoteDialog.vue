@@ -65,14 +65,13 @@ import { useQuasar } from "quasar"
 import { useRouter, useRoute } from "vue-router"
 
 import { api } from "src/boot/axios"
-import { Note, NoteOptions } from "src/store/note/state"
+import { Note } from "src/store/note/state"
 import { useStore } from "../store"
 import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
 import ImageSelectDialog from "components/ImageSelectDialog.vue"
 import { downloadFile } from "src/utils/download"
 import PasswordDialog from "components/PasswordDialog.vue"
-import CryptoJS from "crypto-js"
 import { NoteSecurity } from "../utils/security"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")

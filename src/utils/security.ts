@@ -1,4 +1,3 @@
-import { enc } from "crypto-js"
 import { Note } from "src/store/note/state"
 import CryptoJS from "crypto-js"
 
