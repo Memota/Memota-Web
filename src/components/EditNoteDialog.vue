@@ -238,7 +238,6 @@ export default defineComponent({
     }
 
     const enteredPassword = (newPass: string) => {
-      console.log("got a password: " + newPass)
       askPassword.value = false
 
       if (note != undefined) {
@@ -259,7 +258,6 @@ export default defineComponent({
             })
           }
         } else {
-          console.log("set encryption to true...")
           // set encryption to true
           encrypted.value = true
           password.value = newPass

@@ -7,17 +7,13 @@ export class NoteSecurity {
 
   public static encryptText(text: string, password: string): string {
     // encrypt using AES
-    console.log("encrypting: " + text + " using " + password)
     const encryptedText = CryptoJS.AES.encrypt(NoteSecurity.prefix + text, password).toString()
     return encryptedText
   }
 
   public static decryptContent(note: Note, password: string): string {
     // decrypt using AES
-    console.log("decrypting: " + note.text + " using: " + password)
     const decryptedBytes = CryptoJS.AES.decrypt(note.text, password)
-    console.log("bytes: ")
-    console.log(decryptedBytes)
     const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8)
 
     // detect if the password was correct
