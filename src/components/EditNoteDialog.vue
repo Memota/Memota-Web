@@ -7,9 +7,45 @@
         </div>
         <div class="nav-text text-h6" :class="darkFont ? 'text-black' : 'text-white'">Edit Note</div>
         <div class="buttons">
-          <q-btn flat round icon="image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
-          <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
-          <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
+          <q-btn
+            flat
+            round
+            :icon="pinned ? 'push_pin' : 'o_push_pin'"
+            :color="darkFont ? 'black' : 'white'"
+            @click="togglePinnedState"
+          />
+          <q-btn
+            v-if="!encrypted"
+            flat
+            round
+            :icon="hidden ? 'o_visibility_off' : 'o_visibility'"
+            :color="darkFont ? 'black' : 'white'"
+            @click="toggleHiddenState"
+          />
+          <q-btn
+            flat
+            round
+            :icon="encrypted ? 'o_lock' : 'o_lock_open'"
+            :color="darkFont ? 'black' : 'white'"
+            @click="toggleEncryption"
+          />
+          <q-btn flat round icon="o_image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
+          <q-btn
+            v-if="!encrypted"
+            flat
+            round
+            icon="o_share"
+            :color="darkFont ? 'black' : 'white'"
+            @click="shareDialog = !shareDialog"
+          />
+          <q-btn
+            v-if="!encrypted"
+            flat
+            round
+            icon="o_save_alt"
+            :color="darkFont ? 'black' : 'white'"
+            @click="downloadNote"
+          />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
             <color-picker @onColorChange="updateColor"></color-picker>
           </q-btn>
@@ -34,6 +70,7 @@
       <ImageSelectDialog :note-id="$route.params.id" @select="selectImage"></ImageSelectDialog>
     </Suspense>
   </q-dialog>
+  <PasswordDialog v-if="askPassword" button-text="Submit" @password="enteredPassword"> </PasswordDialog>
 </template>
 
 <script lang="ts">
@@ -48,13 +85,15 @@ import ColorPicker from "src/components/ColorPicker.vue"
 import NoteShareDialog from "components/NoteShareDialog.vue"
 import ImageSelectDialog from "components/ImageSelectDialog.vue"
 import { downloadFile } from "src/utils/download"
+import PasswordDialog from "components/PasswordDialog.vue"
+import { NoteSecurity } from "../utils/security"
 
 const darkColorMatcher = new RegExp("^#([0-7][0-9a-fA-F]){3}")
 
 export default defineComponent({
   name: "EditNoteDialog",
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  components: { ColorPicker, NoteShareDialog, ImageSelectDialog },
+  components: { ColorPicker, NoteShareDialog, ImageSelectDialog, PasswordDialog },
   setup() {
     const store = useStore()
     const route = useRoute()
@@ -67,6 +106,12 @@ export default defineComponent({
     const darkFont = ref<boolean>(false)
     const shareDialog = ref<boolean>(false)
     const imageDialog = ref(false)
+    const passwordDialog = ref(false)
+    const pinned = ref<boolean>(false)
+    const hidden = ref<boolean>(false)
+    const encrypted = ref<boolean>(false)
+    const askPassword = ref<boolean>(false)
+    const password = ref<string>()
 
     let note = store.state.note.notes.find((note) => note.id === route.params.id)
 
@@ -82,9 +127,13 @@ export default defineComponent({
           void router.push("/404")
         }
       }
+      if (!note?.options.encrypted) text.value = note?.text
       title.value = note?.title
-      text.value = note?.text
       color.value = note?.color
+      pinned.value = note?.options.pinned || false
+      hidden.value = note?.options.hidden || false
+      encrypted.value = note?.options.encrypted || false
+      askPassword.value = note?.options.encrypted || false
       if (color.value) updateColor(color.value)
     })
 
@@ -126,11 +175,31 @@ export default defineComponent({
     }
 
     const patchNote = async () => {
+      // Note not loaded yet
+      if (note == undefined) {
+        return
+      }
       const jwt: string = localStorage.getItem("jwt") || ""
       try {
+        let content = text.value
+
+        if (encrypted.value) {
+          // Should never happen - just in case
+          if (password.value == undefined) {
+            throw new Error("no password set")
+          }
+          // Encrypt content
+          content = NoteSecurity.encryptText(text.value || "", password.value)
+        }
+
         await api.patch(
           "/notes/" + (route.params.id as string),
-          { text: text.value, title: title.value, color: color.value },
+          {
+            text: content,
+            title: title.value,
+            color: color.value,
+            options: { pinned: pinned.value, hidden: hidden.value, encrypted: encrypted.value },
+          },
           {
             headers: { Authorization: "Bearer " + jwt },
           },
@@ -168,6 +237,60 @@ export default defineComponent({
       await downloadFile(url, fileName + ".pdf")
     }
 
+    const togglePinnedState = () => {
+      if (note != undefined) {
+        pinned.value = !pinned.value
+        void patchNote()
+      }
+    }
+
+    const toggleHiddenState = () => {
+      if (note != undefined) {
+        hidden.value = !hidden.value
+        void patchNote()
+      }
+    }
+
+    const enteredPassword = (newPass: string) => {
+      askPassword.value = false
+
+      if (note != undefined) {
+        if (encrypted.value) {
+          // try to decrypt note content using the given password
+          try {
+            text.value = NoteSecurity.decryptContent(note, newPass)
+            password.value = newPass
+          } catch (err) {
+            void router.push("/")
+
+            // password wrong?
+            $q.notify({
+              color: "negative",
+              position: "top",
+              message: "Wrong password",
+              icon: "report_problem",
+            })
+          }
+        } else {
+          // set encryption to true
+          encrypted.value = true
+          password.value = newPass
+          void patchNote()
+        }
+      }
+    }
+
+    const toggleEncryption = () => {
+      if (!encrypted.value) {
+        // invoke password prompt
+        askPassword.value = true
+      } else {
+        // decrypt remotely
+        encrypted.value = false
+        void patchNote()
+      }
+    }
+
     return {
       test: ref(true),
       title,
@@ -183,6 +306,15 @@ export default defineComponent({
       note,
       imageDialog,
       selectImage,
+      pinned,
+      togglePinnedState,
+      hidden,
+      toggleHiddenState,
+      passwordDialog,
+      encrypted,
+      toggleEncryption,
+      askPassword,
+      enteredPassword,
     }
   },
 })

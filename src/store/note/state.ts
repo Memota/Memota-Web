@@ -11,6 +11,15 @@ export interface Note {
   updatedAt: Date
   sharedNote: SharedNote
   image: Image
+  options: NoteOptions
+}
+
+export interface NoteOptions {
+  id: string
+  note: Note
+  encrypted: boolean
+  hidden: boolean
+  pinned: boolean
 }
 
 export interface SharedNote {

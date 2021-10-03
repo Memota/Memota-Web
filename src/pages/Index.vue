@@ -1,8 +1,50 @@
 <template>
+  <!-- Pinned  Notes -->
   <div class="background">
     <div v-masonry class="row notes" transition-duration="0.4s" item-selector=".item">
       <div v-for="note in notes" :key="note.id" v-masonry-tile class="item col-xs-12 col-sm-6 col-md-4 col-lg-3">
         <q-card
+          v-if="note.options.pinned"
+          v-ripple
+          class="cursor-pointer note-card"
+          :style="'background-color:' + note.color"
+          @click="$router.push('/edit/' + note.id)"
+        >
+          <JWTImage v-if="note.image" :id="note.image.id"></JWTImage>
+          <q-card-section>
+            <div :class="computeFontColor(note.color)" class="text-h6 note-title">
+              {{ note.title }}
+            </div>
+            <q-icon name="push_pin" :class="computeFontColor(note.color)" class="pin" />
+          </q-card-section>
+
+          <q-card-section
+            v-if="!note.options.hidden && !note.options.encrypted"
+            :class="computeFontColor(note.color)"
+            class="q-pt-none"
+          >
+            {{ note.text }}
+          </q-card-section>
+          <div v-if="note.options.hidden && !note.options.encrypted" class="text-center" style="margin-bottom: 25px">
+            <q-icon name="o_visibility_off" :class="computeFontColor(note.color)" style="font-size: 4rem" />
+          </div>
+          <div v-if="note.options.encrypted" class="text-center" style="margin-bottom: 25px">
+            <q-icon name="o_lock" :class="computeFontColor(note.color)" style="font-size: 4rem" />
+          </div>
+        </q-card>
+      </div>
+    </div>
+    <div v-if="impostor" v-masonry-tile class="item col-xs-12 col-sm-6 col-md-4 col-lg-3 impostor-card"></div>
+    <q-page-sticky position="bottom-right" :offset="[20, 20]">
+      <q-btn fab icon="add" color="accent" @click="createNote" />
+    </q-page-sticky>
+  </div>
+
+  <div class="background">
+    <div v-masonry class="row notes" transition-duration="0.4s" item-selector=".item">
+      <div v-for="note in notes" :key="note.id" v-masonry-tile class="item col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        <q-card
+          v-if="!note.options.pinned"
           v-ripple
           class="cursor-pointer note-card"
           :style="'background-color:' + note.color"
@@ -15,9 +57,19 @@
             </div>
           </q-card-section>
 
-          <q-card-section :class="computeFontColor(note.color)" class="q-pt-none">
+          <q-card-section
+            v-if="!note.options.hidden && !note.options.encrypted"
+            :class="computeFontColor(note.color)"
+            class="q-pt-none"
+          >
             {{ note.text }}
           </q-card-section>
+          <div v-if="note.options.hidden && !note.options.encrypted" class="text-center" style="margin-bottom: 25px">
+            <q-icon name="o_visibility_off" :class="computeFontColor(note.color)" style="font-size: 4rem" />
+          </div>
+          <div v-if="note.options.encrypted" class="text-center" style="margin-bottom: 25px">
+            <q-icon name="o_lock" :class="computeFontColor(note.color)" style="font-size: 4rem" />
+          </div>
         </q-card>
       </div>
     </div>
@@ -127,5 +179,12 @@ export default defineComponent({
 }
 .impostor-card {
   height: 0px;
+}
+.pin {
+  font-size: 1.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 10px;
 }
 </style>
