@@ -30,8 +30,22 @@
             @click="toggleEncryption"
           />
           <q-btn flat round icon="o_image" :color="darkFont ? 'black' : 'white'" @click="imageDialog = !imageDialog" />
-          <q-btn flat round icon="o_share" :color="darkFont ? 'black' : 'white'" @click="shareDialog = !shareDialog" />
-          <q-btn flat round icon="o_save_alt" :color="darkFont ? 'black' : 'white'" @click="downloadNote" />
+          <q-btn
+            v-if="!encrypted"
+            flat
+            round
+            icon="o_share"
+            :color="darkFont ? 'black' : 'white'"
+            @click="shareDialog = !shareDialog"
+          />
+          <q-btn
+            v-if="!encrypted"
+            flat
+            round
+            icon="o_save_alt"
+            :color="darkFont ? 'black' : 'white'"
+            @click="downloadNote"
+          />
           <q-btn flat round icon="o_palette" :color="darkFont ? 'black' : 'white'">
             <color-picker @onColorChange="updateColor"></color-picker>
           </q-btn>
