@@ -165,13 +165,14 @@ export default defineComponent({
   }
 }
 .note-card {
+  white-space: pre-line;
   overflow: hidden;
+  overflow-wrap: break-word;
   margin: 5px;
 }
 .note-card > .q-card {
   overflow: hidden;
   max-height: 400px;
-  white-space: pre-wrap;
 }
 .note-title {
   text-overflow: ellipsis;
